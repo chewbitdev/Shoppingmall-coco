@@ -131,13 +131,8 @@ function AdminLayout() {
   return (
     <AdminWrapper>
       <Sidebar>
-        <Logo><Link to="/admin">Coco 관리자</Link></Logo>
+        <Logo><Link to="/admin/products">Coco 관리자</Link></Logo>
         <NavList>
-          <li>
-            <NavItem to="/admin" $active={isActive('/admin')}>
-              대시보드
-            </NavItem>
-          </li>
           <li>
             <NavItem to="/admin/products" $active={isActive('/admin/product')}>
               상품 관리
