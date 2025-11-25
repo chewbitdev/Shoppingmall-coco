@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import axios from 'axios';
 import ProductCard from '../components/product/list/ProductCard';
 import ProductListSkeleton from '../components/product/list/ProductListSkeleton';
 import Pagination from '../components/product/list/Pagination';
 import ProductSidebar from '../components/product/list/ProductSidebar';
 import ProductListHeader from '../components/product/list/ProductListHeader';
-import { fetchWithAuth, getStoredMember, isLoggedIn  } from '../utils/api';
+import { fetchWithAuth, getStoredMember, isLoggedIn } from '../utils/api';
 
 // 스타일 컴포넌트 정의
 const PageContainer = styled.div`
@@ -15,9 +16,7 @@ const PageContainer = styled.div`
   max-width: 1280px;
   margin: 0 auto;
 
-  /* 모바일 미디어 쿼리 추가 */
   @media (max-width: 768px) {
-    /* 모바일에서는 좌우 여백 줄임 */
     padding: 10px;
   }
 `;
@@ -29,23 +28,57 @@ const MainContent = styled.main`
 const ProductListGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 25px; /* 간격 살짝 넓힘 */
+  gap: 25px;
 `;
+
+// ---------------------------------------------
+// DB/마이페이지 데이터(한글) -> Shop 필터 ID 변환
+// ---------------------------------------------
+
+const reverseSkinMap = {
+  '건성': 'dry',
+  '지성': 'oily',
+  '복합성': 'combination',
+  '민감성': 'sensitive'
+};
+
+const reverseConcernMap = {
+  '모공': 'pores',
+  '주름': 'wrinkle',
+  '건조함': 'moisture',     // 건조함 -> 보습
+  '민감함': 'sensitive',    // 민감함 -> 민감
+  '여드름': 'soothing',     // 여드름 -> 진정
+  '홍조': 'soothing',       // 홍조 -> 진정
+  '다크스팟': 'brightening', // 다크스팟 -> 미백
+  '칙칙함': 'tone'          // 칙칙함 -> 피부톤
+};
+
+const reverseColorMap = {
+  '봄 웜톤': 'spring',
+  '여름 쿨톤': 'summer',
+  '가을 웜톤': 'autumn',
+  '겨울 쿨톤': 'winter'
+};
 
 // -------------------------------
 
 function ProductListPage() {
-  const [products, setProducts] = useState([]); // API 응답의 content 배열
-  const [totalPages, setTotalPages] = useState(0); // 총 페이지 개수
-  const [totalElements, setTotalElements] = useState(0); // 총 상품 개수
-
+  // 상태 관리
+  const [products, setProducts] = useState([]); 
+  const [totalPages, setTotalPages] = useState(0); 
+  const [totalElements, setTotalElements] = useState(0); 
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // 프로필 데이터와 토글 버튼 상태
+  const [userProfile, setUserProfile] = useState(null);
+  const [isProfileMode, setIsProfileMode] = useState(false);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const closeButtonRef = useRef(null);
-  const navigate = useNavigate(); // navigate 훅 사용
+  const navigate = useNavigate();
 
-  // URL에서 현재 상태 읽어오기
+  // URL 파라미터 읽기
   const searchTerm = searchParams.get('q') || '';
   const sortOrder = searchParams.get('sort') || 'popularity';
   const currentPage = Number(searchParams.get('page')) || 1;
@@ -55,17 +88,114 @@ function ProductListPage() {
     personalColors: searchParams.getAll('personalColor')
   };
 
-  // 전체 상품 목록은 처음에 한 번만 불러오기
+  // ------------------------------------------------------
+  // 페이지 로드 시 사용자 프로필 정보 가져오기 (로그인 한 경우)
+  // ------------------------------------------------------
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!isLoggedIn()) return;
+      
+      const member = getStoredMember();
+      if (!member || !member.memNo) return;
+
+      try {
+        const response = await axios.get(`http://localhost:8080/api/coco/members/profile/${member.memNo}`);
+        setUserProfile(response.data);
+        
+        // 최초 진입 시 필터가 하나도 없다면 자동으로 '내 맞춤' 적용
+        
+        const hasAnyFilter = searchParams.toString().length > 0;
+        if (!hasAnyFilter && response.data) {
+           applyProfileFilters(response.data);
+        }
+        
+      } catch (error) {
+        console.error("프로필 로드 실패:", error);
+      }
+    };
+    
+    fetchProfile();
+  }, []);
+
+  // ------------------------------------------------------
+  // 필터 적용/해제 로직 (토글 버튼용)
+  // ------------------------------------------------------
+  
+  // 프로필 필터 적용
+  const applyProfileFilters = (profileData) => {
+    if (!profileData) return;
+
+    const newParams = new URLSearchParams(searchParams);
+    let updated = false;
+
+    // 기존 피부 관련 필터는 제거하고 내 프로필로 덮어씌움
+    newParams.delete('skinType');
+    newParams.delete('skinConcern');
+    newParams.delete('personalColor');
+
+    // 피부 타입 매핑
+    if (profileData.skinType) {
+      const code = reverseSkinMap[profileData.skinType];
+      if (code) { newParams.append('skinType', code); updated = true; }
+    }
+    // 피부 고민 매핑
+    if (profileData.concerns && profileData.concerns.length > 0) {
+      profileData.concerns.forEach(c => {
+        const code = reverseConcernMap[c.trim()];
+        if (code) { newParams.append('skinConcern', code); updated = true; }
+      });
+    }
+    // 퍼스널 컬러 매핑
+    if (profileData.personalColor) {
+      const code = reverseColorMap[profileData.personalColor.trim()];
+      if (code) { newParams.append('personalColor', code); updated = true; }
+    }
+
+    if (updated) {
+      newParams.set('page', '1'); // 페이지 1로 리셋
+      setSearchParams(newParams);
+      setIsProfileMode(true); // 버튼 ON 상태로 변경
+    } else {
+      alert("프로필에 설정된 정보가 없거나 매칭되는 필터가 없습니다.");
+    }
+  };
+
+  // 프로필 필터 해제
+  const clearProfileFilters = () => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    // 피부 관련 필터만 싹 지우기
+    newParams.delete('skinType');
+    newParams.delete('skinConcern');
+    newParams.delete('personalColor');
+    
+    setSearchParams(newParams);
+    setIsProfileMode(false); // 버튼 OFF 상태로 변경
+  };
+
+  // 토글 핸들러
+  const handleProfileToggle = () => {
+    if (isProfileMode) {
+      clearProfileFilters();
+    } else {
+      if (userProfile) {
+        applyProfileFilters(userProfile);
+      } else {
+        alert("피부 프로필 정보를 불러올 수 없습니다. 마이페이지에서 설정해주세요.");
+      }
+    }
+  };
+
+  // ------------------------------------------------------
+  // 상품 목록 조회 (URL 파라미터 변경 감지)
+  // ------------------------------------------------------
   useEffect(() => {
     const controller = new AbortController();
     const fetchProducts = async () => {
-      setIsLoading(true); // 로딩 시작
+      setIsLoading(true); 
 
       try {
-        // searchParams를 API URL 쿼리 스트링으로 변환
         const queryString = searchParams.toString();
-
-        // 실제 API 호출
         const response = await fetch(`http://localhost:8080/api/products?${queryString}`, {
           signal: controller.signal
         });
@@ -90,46 +220,40 @@ function ProductListPage() {
       }
     };
 
-    fetchProducts(); // 함수 실행
+    fetchProducts(); 
 
     return () => {
       controller.abort();
     };
+  }, [searchParams]); 
 
-
-  }, [searchParams]); // searchParams가 변경될 때마다 useEffect 다시 실행
-
-  // isFilterOpen 상태가 변경될 때 포커스를 제어하는 useEffect
+  // 필터 UI 포커스 제어
   useEffect(() => {
     if (isFilterOpen) {
-      // 필터가 열리면, 0.1초 뒤 닫기 버튼에 포커스
       setTimeout(() => {
-        closeButtonRef.current?.focus(); // .current가 실제 DOM 요소를 가리킴
-      }, 100); // 100ms 딜레이
+        closeButtonRef.current?.focus();
+      }, 100); 
     }
-  }, [isFilterOpen]); // isFilterOpen이 바뀔 때마다 실행
+  }, [isFilterOpen]);
 
-  // URL 파라미터를 업데이트하는 공통 함수
+  // ------------------------------------------------------
+  // 이벤트 핸들러 (검색, 정렬, 필터 변경 시 '내 맞춤' 해제)
+  // ------------------------------------------------------
+
+  // URL 파라미터 업데이트 공통 함수
   const updateSearchParams = (newParams, resetPage = true) => {
-    // 현재 URL의 모든 파라미터를 복사
     const params = new URLSearchParams(searchParams);
-
-    // 새 파라미터 적용 (e.g., {q: '세럼'}, {sort: 'newest'})
     for (const [key, value] of Object.entries(newParams)) {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key); // 값이 없으면 URL에서 제거
-      }
+      if (value) params.set(key, value);
+      else params.delete(key);
     }
-    // 페이지 변경이 아닌 경우, 1페이지로 리셋
-    if (resetPage) {
-      params.set('page', '1');
-    }
+    if (resetPage) params.set('page', '1');
+    
     setSearchParams(params);
+    setIsProfileMode(false); // [중요] 수동 조작 시 토글 버튼 OFF
   };
 
-  // 배열(필터)을 위한 핸들러
+  // 사이드바 필터 변경 핸들러
   const handleFilterChange = (category, value) => {
     const currentValues = searchParams.getAll(category);
     let newValues;
@@ -144,45 +268,42 @@ function ProductListPage() {
     params.delete(category);
     newValues.forEach(val => params.append(category, val));
     params.set('page', '1');
+    
     setSearchParams(params);
+    setIsProfileMode(false); // [중요] 수동 조작 시 토글 버튼 OFF
   };
 
-  // 검색어 변경 핸들러
   const handleSearchChange = (e) => {
     updateSearchParams({ q: e.target.value });
   };
 
-  // 정렬 변경 핸들러
   const handleSortChange = (e) => {
     updateSearchParams({ sort: e.target.value });
   };
 
-  // 페이지 변경 핸들러
   const handlePageChange = (pageNumber) => {
-    updateSearchParams({ page: pageNumber.toString() }, false);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNumber.toString());
+    setSearchParams(params);
   };
 
-  // 장바구니 담기 핸들러
+  // 장바구니 담기
   const handleAddToCart = async (e, product) => {
-    // 상세 페이지 이동 방지
     e.preventDefault(); 
     e.stopPropagation();
 
-    // 로그인 확인
     if (!isLoggedIn()) {
       alert('로그인이 필요한 서비스입니다.');
       navigate('/login');
       return;
     }
 
-    // 회원 정보 확인
     const member = getStoredMember();
     if (!member || !member.memNo) {
         alert('회원 정보를 찾을 수 없습니다.');
         return;
     }
 
-    // 옵션 번호 확인
     if (!product.defaultOptionNo) {
         alert('옵션을 선택해야 하는 상품입니다. 상세 페이지에서 담아주세요.');
         navigate(`/products/${product.prdNo}`);
@@ -190,13 +311,12 @@ function ProductListPage() {
     }
 
     try {
-        // API 호출
         const response = await fetchWithAuth('/coco/members/cart/items', {
             method: 'POST',
             body: JSON.stringify({
                 memNo: member.memNo,
                 optionNo: product.defaultOptionNo,
-                cartQty: 1 // 목록에서는 기본 1개 담기
+                cartQty: 1
             })
         });
 
@@ -214,7 +334,6 @@ function ProductListPage() {
     }
   };
 
-  // 로딩이 끝나고 상품을 화면에 그리기
   return (
     <PageContainer>
       <ProductSidebar
@@ -223,6 +342,9 @@ function ProductListPage() {
         closeButtonRef={closeButtonRef}
         activeFilters={activeFilters}
         onFilterChange={handleFilterChange}
+        isLoggedIn={isLoggedIn()}
+        isProfileMode={isProfileMode}
+        onProfileToggle={handleProfileToggle}
       />
 
       {/* --- 메인 상품 목록 --- */}
