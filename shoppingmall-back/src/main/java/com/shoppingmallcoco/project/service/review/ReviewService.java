@@ -2,6 +2,7 @@ package com.shoppingmallcoco.project.service.review;
 
 import com.shoppingmallcoco.project.dto.review.ReviewDTO;
 import com.shoppingmallcoco.project.dto.review.SimilarSkinStatsDTO;
+import com.shoppingmallcoco.project.entity.auth.Member;
 import com.shoppingmallcoco.project.entity.mypage.SkinProfile;
 import com.shoppingmallcoco.project.entity.order.OrderItem;
 import com.shoppingmallcoco.project.entity.product.ProductEntity;
@@ -10,6 +11,7 @@ import com.shoppingmallcoco.project.entity.review.ReviewImage;
 import com.shoppingmallcoco.project.entity.review.ReviewLike;
 import com.shoppingmallcoco.project.entity.review.ReviewTagMap;
 import com.shoppingmallcoco.project.entity.review.Tag;
+import com.shoppingmallcoco.project.repository.auth.MemberRepository;
 import com.shoppingmallcoco.project.repository.mypage.SkinRepository;
 import com.shoppingmallcoco.project.repository.order.OrderItemRepository;
 import com.shoppingmallcoco.project.repository.review.LikeRepository;
@@ -39,6 +41,7 @@ public class ReviewService implements IReviewService {
     private final TagRepository tagRepository;
     private final FileUploadService fileUploadService;
     private final SkinRepository skinRepository;
+    private final MemberRepository memberRepository;
 
     // review 등록
     @Transactional
@@ -198,8 +201,7 @@ public class ReviewService implements IReviewService {
 
         String skinType = userSkin.getSkinType();
 
-        // 분모 계산: 이 상품에 대해 '지성' 피부 유저가 쓴 총 리뷰 수
-
+        // 분모 계산: 이 상품에 대해 'OO' 피부 유저가 쓴 총 리뷰 수
         long totalReviewers = reviewTagMapRepository.countReviewsByProductAndSkinType(prdNo,
             skinType);
 
@@ -218,7 +220,8 @@ public class ReviewService implements IReviewService {
 
         List<SimilarSkinStatsDTO.TagStat> stats = topTags.stream().map(tag -> {
             int percentage = (int) Math.round(((double) tag.getCount() / totalReviewers) * 100);
-            return new SimilarSkinStatsDTO.TagStat(tag.getTagName(), percentage, tag.getCount(), tag.getTagStatus());
+            return new SimilarSkinStatsDTO.TagStat(tag.getTagName(), percentage, tag.getCount(),
+                tag.getTagStatus());
         }).collect(Collectors.toList());
 
         return SimilarSkinStatsDTO.builder().skinType(skinType).totalReviewerCount(totalReviewers)
@@ -230,24 +233,23 @@ public class ReviewService implements IReviewService {
     public int toggleLike(Long reviewNo, Long memNo) {
         Review review = reviewRepository.findById(reviewNo)
             .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
-        
+
         Member member = memberRepository.findById(memNo)
             .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         boolean exists = likeRepository.existsByMember_MemNoAndReview_ReviewNo(memNo, reviewNo);
-        
+
         if (exists) {
             // 좋아요 삭제
             likeRepository.findByMember_MemNo(memNo).stream()
-                .filter(like -> like.getReview().getReviewNo().equals(reviewNo))
-                .findFirst()
+                .filter(like -> like.getReview().getReviewNo().equals(reviewNo)).findFirst()
                 .ifPresent(likeRepository::delete);
         } else {
             // 좋아요 추가
             ReviewLike reviewLike = ReviewLike.toEntity(member, review);
             likeRepository.save(reviewLike);
         }
-        
+
         // 업데이트된 좋아요 개수 반환
         return likeRepository.countByReview(review);
     }
