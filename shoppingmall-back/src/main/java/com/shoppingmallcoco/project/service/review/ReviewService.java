@@ -202,6 +202,12 @@ public class ReviewService implements IReviewService {
         return reviewDtoList;
     }
 
+    // review 재구매 횟수
+    public int getBuyCount( Long prdNo, Long memNo) {
+        int orderItemCounts = orderItemRepository.countOrderItemsByOrderAndOrderItem(prdNo, memNo);
+        return orderItemCounts;
+    }
+
     // 특정 상품의 리뷰 개수 조회
     @Override
     public int getReviewCount(ProductEntity product) {
