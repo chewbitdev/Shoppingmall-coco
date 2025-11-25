@@ -22,20 +22,20 @@ public class OrderController {
      * 주문 생성 API
      */
     @PostMapping
-    public ResponseEntity<String> createOrder(
+
+    public ResponseEntity<Long> createOrder(
             @RequestBody OrderRequestDto requestDto,
             @AuthenticationPrincipal String memId
     ) {
         try {
-
             Long orderNo = orderService.createOrder(requestDto, memId);
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("주문이 성공적으로 생성되었습니다. 주문번호: " + orderNo);
+            //주문번호만 반환
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderNo);
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            // 실패 시에는 Bad Request 상태코드만 보내거나, 에러 객체를 보냄 (여기선 상태코드 위주)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
