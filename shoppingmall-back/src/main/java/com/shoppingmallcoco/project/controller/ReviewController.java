@@ -4,14 +4,15 @@ import com.shoppingmallcoco.project.dto.review.ReviewDTO;
 import com.shoppingmallcoco.project.dto.review.TagDTO;
 import com.shoppingmallcoco.project.entity.auth.Member;
 import com.shoppingmallcoco.project.entity.review.Tag;
+import com.shoppingmallcoco.project.repository.order.OrderItemRepository;
+import com.shoppingmallcoco.project.repository.review.ReviewRepository;
 import com.shoppingmallcoco.project.repository.auth.MemberRepository;
 import com.shoppingmallcoco.project.service.review.ReviewService;
 import com.shoppingmallcoco.project.service.review.TagService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +33,8 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final TagService tagService;
+    private final OrderItemRepository orderItemRepository;
+    private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
 
     // 리뷰 작성 페이지 데이터 저장
@@ -103,6 +106,27 @@ public class ReviewController {
         return tagDTOList;
     }
 
+    //orderItemNo 유뮤 확인
+    @GetMapping("/orderItems/{orderItemNo}/check")
+    public ResponseEntity<?> checkOrderItems(@PathVariable Long orderItemNo) {
+        boolean exists = orderItemRepository.existsById(orderItemNo);
+        if (exists) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    //reviewNo 유무 확인
+    @GetMapping("/review/{reviewNo}/check")
+    public ResponseEntity<?> checkReviewNo(@PathVariable Long reviewNo) {
+        boolean exists = reviewRepository.existsById(reviewNo);
+        if (exists) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     // 좋아요 추가/삭제 (토글)
     @PostMapping("/reviews/{reviewNo}/like")
     public int toggleLike(@PathVariable("reviewNo") Long reviewNo, Authentication authentication) {

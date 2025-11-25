@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ProductButton from '../ProductButton';
+import SimilarSkinReview from '../../../features/SimilarSkinReview';
 
 // 스타일
 const InfoBox = styled.div`
@@ -195,7 +196,11 @@ const ProductInfoBox = ({
         </QuantityControl>
       </div>
 
+      <div>
+         <SimilarSkinReview productId={product.prdNo} />
+      </div>
       {/* 장바구니 버튼 */}
+      
       <ButtonGroup>
         <ProductButton
           onClick={handleAddToCart}
