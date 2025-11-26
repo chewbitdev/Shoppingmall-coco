@@ -8,6 +8,7 @@ import com.shoppingmallcoco.project.dto.comate.LikedReviewDTO;
 import com.shoppingmallcoco.project.dto.comate.MyReviewDTO;
 import com.shoppingmallcoco.project.entity.review.Review;
 import com.shoppingmallcoco.project.entity.review.ReviewLike;
+import com.shoppingmallcoco.project.repository.product.ProductRepository;
 import com.shoppingmallcoco.project.repository.review.LikeRepository;
 import com.shoppingmallcoco.project.repository.review.ReviewRepository;
 
@@ -53,11 +54,18 @@ public class CM_ReviewService {
         	boolean likedByCurrentUser = currentMemNo != null &&
         		likeRepository.existsByMember_MemNoAndReview_ReviewNo(currentMemNo, review.getReviewNo());
         	
+        	// 상품 사진 파일 가져오기
+        	String productImg = null;
+            if (product.getImages() != null && !product.getImages().isEmpty()) {
+                productImg = product.getImages().get(0).getImageUrl();
+            }
+        	
         	return MyReviewDTO.builder()
         		.reviewNo(review.getReviewNo())
                 .productNo(product.getPrdNo())
                 .productName(product.getPrdName())
                 .productOption(option != null ? option.getOptionName() : null)
+                .productImg(productImg)
                 .rating(review.getRating())
                 .createdAt(review.getCreatedAt())
                 .tags(tags)
@@ -109,12 +117,19 @@ public class CM_ReviewService {
         			var reviewMember = orderItem.getOrder().getMember();
         			boolean likedByCurrentUser = currentMemNo != null &&
         	        		likeRepository.existsByMember_MemNoAndReview_ReviewNo(currentMemNo, review.getReviewNo());
-        	        	
+        	        
+        			// 상품 사진 파일 가져오기
+                	String productImg = null;
+                    if (product.getImages() != null && !product.getImages().isEmpty()) {
+                        productImg = product.getImages().get(0).getImageUrl();
+                    }
+        			
         			return LikedReviewDTO.builder()
         					.reviewNo(review.getReviewNo())
                             .productNo(product.getPrdNo())
                             .productName(product.getPrdName())
                             .productOption(option != null ? option.getOptionName() : null)
+                            .productImg(productImg)
                             .rating(review.getRating())
                             .createdAt(review.getCreatedAt())
                             .tags(tags)

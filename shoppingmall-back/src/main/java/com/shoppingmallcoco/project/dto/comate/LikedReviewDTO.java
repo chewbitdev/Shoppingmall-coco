@@ -14,6 +14,7 @@ public class LikedReviewDTO {
     private Long productNo;
     private String productName;
     private String productOption;
+    private String productImg;
     
     private Long authorNo;
     private String authorNickname;

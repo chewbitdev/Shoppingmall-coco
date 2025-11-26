@@ -13,6 +13,7 @@ public class MyReviewDTO {
     private Long productNo;
     private String productName;
     private String productOption;
+    private String productImg;
     
     private Integer rating;
     private String content;

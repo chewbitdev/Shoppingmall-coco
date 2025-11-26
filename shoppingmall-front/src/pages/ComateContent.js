@@ -60,35 +60,35 @@ const ComateContent = ({
     switch(activeTab) {
         case 'review':
             title = "누적 리뷰";
-            content = reviewList.map((item, index) => <ComateReviewCard 
-                                                        key={item.reviewNo}
-                                                        {...item}
-                                                        onToggleLike={async (reviewNo, likedByCurrentUser) => {
-                                                            setReviewList(prev => prev.map(r =>
-                                                            r.reviewNo === reviewNo ? {
-                                                                ...r, 
-                                                                likedByCurrentUser: !likedByCurrentUser,
-                                                                likeCount: likedByCurrentUser ? r.likeCount - 1 : r.likeCount + 1
-                                                                } : r
-                                                            ));
-                                                            if (typeof onLikeChange === 'function') onLikeChange(!likedByCurrentUser);
-                                                        }} />);
+            content = reviewList.map((item) => <ComateReviewCard 
+                                                    key={item.reviewNo}
+                                                    {...item}
+                                                    onToggleLike={async (reviewNo, likedByCurrentUser) => {
+                                                        setReviewList(prev => prev.map(r =>
+                                                        r.reviewNo === reviewNo ? {
+                                                            ...r, 
+                                                            likedByCurrentUser: !likedByCurrentUser,
+                                                            likeCount: likedByCurrentUser ? r.likeCount - 1 : r.likeCount + 1
+                                                            } : r
+                                                        ));
+                                                        if (typeof onLikeChange === 'function') onLikeChange(!likedByCurrentUser);
+                                                    }} />);
             break;
         case 'like':
             title = "좋아요";
-            content = likeList.map((item, index) => <ComateReviewCard 
-                                                        key={item.reviewNo} 
-                                                        {...item} 
-                                                        authorNo={item.authorNo}
-                                                        authorNickname={item.authorNickname}
-                                                        onToggleLike={async (reviewNo, likedByCurrentUser) => {
-                                                            if (likedByCurrentUser) {
-                                                                setLikeList(prev => prev.filter(r => r.reviewNo !== reviewNo));
-                                                            } 
+            content = likeList.map((item) => <ComateReviewCard 
+                                                    key={item.reviewNo} 
+                                                    {...item} 
+                                                    authorNo={item.authorNo}
+                                                    authorNickname={item.authorNickname}
+                                                    onToggleLike={async (reviewNo, likedByCurrentUser) => {
+                                                        if (likedByCurrentUser) {
+                                                            setLikeList(prev => prev.filter(r => r.reviewNo !== reviewNo));
+                                                        } 
 
-                                                            if (typeof onLikeChange === 'function') onLikeChange(!likedByCurrentUser);
-                                                        }}
-                                                        />);
+                                                        if (typeof onLikeChange === 'function') onLikeChange(!likedByCurrentUser);
+                                                    }}
+                                                    />);
             break;
         case 'follower':
             title = "팔로워";

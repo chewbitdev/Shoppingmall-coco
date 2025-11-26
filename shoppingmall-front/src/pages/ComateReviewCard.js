@@ -10,7 +10,7 @@ import { toggleLike } from '../utils/comate_api';
 
 const ComateReviewCard = ({
     reviewNo,
-    productNo, productName, productOption, createdAt, 
+    productNo, productName, productOption, createdAt, productImg,
     rating, content, tags, 
     likeCount, likedByCurrentUser,
     authorNo, authorNickname,
@@ -37,7 +37,7 @@ const ComateReviewCard = ({
         <div className="comate_review_wrapper">
             <Link to={`/products/${productNo}`}>
                 <div className="comate_product_info">
-                    <img src={sampleImg_product} alt={productName} className="product_img comate"/>
+                    <img src={productImg} alt={productName} className="product_img comate"/>
                     <div className="text_info">
                         <div className="product_name">{productName}</div>
                         <div className="product_option">{productOption}</div>
