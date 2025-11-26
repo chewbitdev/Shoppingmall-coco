@@ -56,7 +56,13 @@ function ProductForm({ initialData, categories, onSubmit, isEdit }) {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }));
+      setFormData(prev => ({ 
+        ...prev, 
+        ...initialData,
+        skinType: initialData.skinTypes || [],
+        skinConcern: initialData.skinConcerns || [],
+        personalColor: initialData.personalColors || []
+      }));
       if (initialData.options && initialData.options.length > 0) {
         setOptions(initialData.options);
       }
