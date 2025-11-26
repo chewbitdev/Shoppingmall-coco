@@ -18,7 +18,7 @@ function AdminProductList() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(''); // 실제 검색 요청용 (API)
   const [debounceTimer, setDebounceTimer] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('idAsc'); // 기본 정렬: ID 오름차순
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -178,7 +178,7 @@ function AdminProductList() {
           </select>
 
           <select className="filter-select" value={selectedStatus} onChange={handleFilterChange(setSelectedStatus)}>
-            <option value="">전체 상태</option>
+            <option value="ALL">전체 상태</option>
             <option value="SALE">판매중</option>
             <option value="SOLD_OUT">품절</option>
             <option value="STOP">판매중지</option>

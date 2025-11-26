@@ -33,7 +33,10 @@ const TAG_OPTIONS = {
     { id: 'elasticity', label: '탄력' }, { id: 'pores', label: '모공' }
   ],
   personalColors: [
-    { id: 'cool', label: '쿨톤' }, { id: 'warm', label: '웜톤' }, { id: 'neutral', label: '뉴트럴톤' }
+    { id: 'spring', label: '봄 웜톤' }, 
+    { id: 'summer', label: '여름 쿨톤' }, 
+    { id: 'autumn', label: '가을 웜톤' }, 
+    { id: 'winter', label: '겨울 쿨톤' }
   ]
 };
 
@@ -53,7 +56,13 @@ function ProductForm({ initialData, categories, onSubmit, isEdit }) {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }));
+      setFormData(prev => ({ 
+        ...prev, 
+        ...initialData,
+        skinType: initialData.skinTypes || [],
+        skinConcern: initialData.skinConcerns || [],
+        personalColor: initialData.personalColors || []
+      }));
       if (initialData.options && initialData.options.length > 0) {
         setOptions(initialData.options);
       }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ProductButton from '../ProductButton';
 import SimilarSkinReview from '../../../features/SimilarSkinReview';
@@ -75,6 +76,11 @@ const Tag = styled.span`
   color: #555;
   padding: 4px 8px;
   border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: #ddd;
+    color: #000;
+  }
 `;
 
 // 수량 조절 컨테이너 스타일
@@ -118,16 +124,41 @@ const QuantityValue = styled.input`
   -moz-appearance: textfield;
 `;
 
-const skinTypeMap = { dry: '건성', oily: '지성', combination: '복합성', sensitive: '민감성' };
+// 하단 총 금액 표시용 스타일 컨테이너
+const TotalPriceBox = styled.div`
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  align-items: baseline;     /* 텍스트 라인 맞춤 */
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f4f4f4; /* 구분선 */
+`;
+
+const TotalPriceLabel = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-right: 10px;
+`;
+
+const TotalPriceValue = styled.span`
+  font-size: 26px;
+  font-weight: 800;
+  color: #333; /* 강조색 */
+`;
+
+const skinTypeMap = { all: '모든피부', dry: '건성', oily: '지성', combination: '복합성', sensitive: '민감성' };
 const skinConcernMap = {
   hydration: '수분', moisture: '보습', brightening: '미백', tone: '피부톤',
   soothing: '진정', sensitive: '민감', uv: '자외선차단', wrinkle: '주름',
   elasticity: '탄력', pores: '모공'
 };
 const personalColorMap = {
-  cool: '쿨톤',
-  warm: '웜톤',
-  neutral: '뉴트럴톤'
+  spring: '봄 웜톤',
+  summer: '여름 쿨톤',
+  autumn: '가을 웜톤',
+  winter: '겨울 쿨톤'
 };
 
 const ProductInfoBox = ({
@@ -145,22 +176,43 @@ const ProductInfoBox = ({
   const isStop = product.status === '판매중지' || product.status === 'STOP';
   const isUnavailable = isSoldOut || isStop;
 
+  // 최종 가격 계산 로직
+  // 선택된 옵션 객체 찾기
+  const selectedOpt = product.options?.find(opt => opt.optionNo === Number(selectedOption));
+  
+  // 단가 계산 (기본 가격 + 옵션 추가금)
+  const unitPrice = product.prdPrice + (selectedOpt?.addPrice || 0);
+
+  // 총 금액 계산 (단가 * 수량)
+  const totalPrice = unitPrice * quantity;
+
+  const navigate = useNavigate();
+
+  // 태그 클릭 핸들러
+  const handleTagClick = (keyword) => {
+    navigate(`/product?q=${encodeURIComponent(keyword)}`);
+  };
+
   return (
     <InfoBox>
       <ProductName>{product.prdName}</ProductName>
       <ProductRating>⭐ {product.averageRating} ({product.reviewCount})</ProductRating>
       <TagContainer>
-        {product.skinTypes?.map(type => (
-          <Tag key={type}># {skinTypeMap[type] || type}</Tag>
-        ))}
-        {product.skinConcerns?.map(concern => (
-          <Tag key={concern}># {skinConcernMap[concern] || concern}</Tag>
-        ))}
-        {product.personalColors?.map(color => (
-          <Tag key={color}># {personalColorMap[color] || color}</Tag>
-        ))}
+        {product.skinTypes?.map(type => {
+            const label = skinTypeMap[type] || type;
+            return <Tag key={type} onClick={() => handleTagClick(label)}># {label}</Tag>
+        })}
+        {product.skinConcerns?.map(concern => {
+            const label = skinConcernMap[concern] || concern;
+            return <Tag key={concern} onClick={() => handleTagClick(label)}># {label}</Tag>
+        })}
+        {product.personalColors?.map(color => {
+            const label = personalColorMap[color] || color;
+            return <Tag key={color} onClick={() => handleTagClick(label)}># {label}</Tag>
+        })}
       </TagContainer>
-      <ProductPrice>{product.prdPrice.toLocaleString()}원</ProductPrice>
+      {/* 단가 표시 */}
+      <ProductPrice> {unitPrice.toLocaleString()}원 </ProductPrice>
 
       {/* --- 옵션 선택 --- */}
       {product.options && product.options.length > 0 && (
@@ -195,6 +247,12 @@ const ProductInfoBox = ({
           <QuantityBtn onClick={() => setQuantity(quantity + 1)}>+</QuantityBtn>
         </QuantityControl>
       </div>
+
+      {/* 총 상품 금액 별도 표시 */}
+      <TotalPriceBox>
+        <TotalPriceLabel>총 상품 금액</TotalPriceLabel>
+        <TotalPriceValue>{totalPrice.toLocaleString()}원</TotalPriceValue>
+      </TotalPriceBox>
 
       <div>
          <SimilarSkinReview productId={product.prdNo} />

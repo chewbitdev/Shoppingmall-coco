@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ProductButton from '../ProductButton';
 
@@ -65,23 +65,11 @@ const Tag = styled.span`
   border-radius: 4px;
   white-space: nowrap;
   flex-shrink: 0;
-`;
-
-// 간단 리뷰
-const SimpleReview = styled.p`
-  font-size: 13px;
-  color: #555;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f5f5f5;
-  font-style: italic;
-
-  /* --- 말줄임표 스타일 --- */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  cursor: pointer; /* 클릭 가능하다는 표시 */
+  &:hover {
+    background-color: #e0e0e0; /* 호버 효과 */
+    color: #333;
+  }
 `;
 
 const ProductPrice = styled.p`
@@ -131,6 +119,7 @@ const skinConcernMap = {
 };
 
 const skinTypeMap = {
+  all: '모든 피부',
   dry: '건성',
   oily: '지성',
   combination: '복합성',
@@ -138,9 +127,10 @@ const skinTypeMap = {
 };
 
 const personalColorMap = {
-  cool: '쿨톤',
-  warm: '웜톤',
-  neutral: '뉴트럴톤'
+  spring: '봄 웜톤',
+  summer: '여름 쿨톤',
+  autumn: '가을 웜톤',
+  winter: '겨울 쿨톤'
 };
 
 
@@ -148,6 +138,17 @@ const personalColorMap = {
 const ProductCard = ({ product, onAddToCart }) => {
   const isSoldOut = product.status === '품절' || product.status === 'SOLD_OUT';
   const isStop = product.status === '판매중지' || product.status === 'STOP';
+
+  const navigate = useNavigate();
+
+  // 태그 클릭 핸들러
+  const handleTagClick = (e, keyword) => {
+    e.preventDefault(); // Link 이동 방지
+    e.stopPropagation(); // 상위 클릭 이벤트 전파 방지
+    
+    // 검색 페이지로 이동하며 q 파라미터 전달
+    navigate(`/product?q=${encodeURIComponent(keyword)}`);
+  };
 
   return (
     <CardLink to={isSoldOut || isStop ? '#' : `/products/${product.prdNo}`} style={{ cursor: isSoldOut ? 'default' : 'pointer' }}>
@@ -168,20 +169,34 @@ const ProductCard = ({ product, onAddToCart }) => {
         </ProductRating>
         <TagContainer>
           {/* SkinType 태그 */}
-          {product.skinTypes?.map(type => (
-            <Tag key={type}># {skinTypeMap[type] || type}</Tag>
-          ))}
+          {product.skinTypes?.map(type => {
+            const label = skinTypeMap[type] || type;
+            return (
+              <Tag key={type} onClick={(e) => handleTagClick(e, label)}>
+                # {label}
+              </Tag>
+            );
+          })}
           {/* SkinConcern 태그 */}
-          {product.skinConcerns?.map(concern => (
-            <Tag key={concern}># {skinConcernMap[concern] || concern}</Tag>
-          ))}
+          {product.skinConcerns?.map(concern => {
+            const label = skinConcernMap[concern] || concern;
+            return (
+              <Tag key={concern} onClick={(e) => handleTagClick(e, label)}>
+                # {label}
+              </Tag>
+            );
+          })}
           {/* personalColor 태그 */}
-          {product.personalColors?.map(color => (
-            <Tag key={color}># {personalColorMap[color] || color}</Tag>
-          ))}
+          {product.personalColors?.map(color => {
+            const label = personalColorMap[color] || color;
+            return (
+              <Tag key={color} onClick={(e) => handleTagClick(e, label)}>
+                # {label}
+              </Tag>
+            );
+          })}
         </TagContainer>
         <ProductPrice>{product.prdPrice.toLocaleString()}원</ProductPrice>
-        <SimpleReview>{product.simpleReview}</SimpleReview>
 
         <ProductButton
           onClick={(e) => {

@@ -21,16 +21,25 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding: 10px;
-  background: #f9f9f9;
+  padding: 15px;
+  background: #fff;
   border-radius: 8px;
+  border: 1px solid #eee;
   position: sticky;
   top: 0;
   z-index: 10;
+  flex-wrap: wrap;
+  gap: 10px;
+`;
+
+const LeftGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
 `;
 
 const FilterButton = styled.button`
-  display: none;
+display: none;
   padding: 8px 12px;
   font-size: 14px;
   font-weight: 600;
@@ -40,7 +49,6 @@ const FilterButton = styled.button`
   cursor: pointer;
   @media (max-width: 768px) {
     display: block;
-    margin-right: 10px;
   }
 `;
 
@@ -50,11 +58,19 @@ const TopBarControls = styled.div`
 `;
 
 const ProductCount = styled.span`
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
+  color: #666;
   & strong {
-    color: #4e54c8;
+    color: #333;
+    font-weight: 700;
   }
+`;
+
+const RightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const SortSelect = styled.select`
@@ -63,28 +79,51 @@ const SortSelect = styled.select`
   border-radius: 4px;
   font-size: 14px;
   background: white;
+  cursor: pointer;
+  outline: none;
+`;
+
+// 내 피부 프로필 토글 버튼 스타일
+const ProfileToggleBtn = styled.button`
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  /* 활성화 상태(isactive)에 따른 스타일 분기 */
+  background-color: ${props => props.$active ? '#333' : '#f5f5f5'};
+  color: ${props => props.$active ? '#fff' : '#888'};
+  border: 1px solid ${props => props.$active ? '#333' : '#ddd'};
+
+  &:hover {
+    background-color: ${props => props.$active ? '#444' : '#e9e9e9'};
+  }
 `;
 
 const ProductListHeader = ({
   searchTerm,
-  onSearchChange,
   totalElements,
   sortOrder,
   onSortChange,
-  onFilterToggle // (필터 열기 버튼 클릭)
+  onFilterToggle
 }) => {
   return (
-    <>
-      <TopBar>
-        <TopBarControls>
-          <FilterButton onClick={onFilterToggle}>
-            필터
-          </FilterButton>
-          <ProductCount>
-            총 <strong>{totalElements}</strong>개 상품
-          </ProductCount>
-        </TopBarControls>
-        
+    <TopBar>
+      <LeftGroup>
+        <FilterButton onClick={onFilterToggle}>
+          필터
+        </FilterButton>
+        <ProductCount>
+          총 <strong>{totalElements}</strong>개
+        </ProductCount>
+      </LeftGroup>
+      
+      <RightGroup>
         <SortSelect 
           value={sortOrder} 
           onChange={onSortChange}
@@ -94,8 +133,8 @@ const ProductListHeader = ({
           <option value="priceAsc">가격 낮은 순</option>
           <option value="priceDesc">가격 높은 순</option>
         </SortSelect>
-      </TopBar>
-    </>
+      </RightGroup>
+    </TopBar>
   );
 };
 
