@@ -137,7 +137,10 @@ function ProductListPage() {
           signal: controller.signal
         });
 
-        setProducts(response.data.content);
+        // 받아온 데이터에서 판매중지 상품은 화면에서 제외
+        const validContent = (response.data.content || []).filter(p => p.status !== '판매중지');
+
+        setProducts(validContent);
         setTotalPages(response.data.totalPages);
         setTotalElements(response.data.totalElements);
       } catch (error) { 
