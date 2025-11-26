@@ -12,7 +12,7 @@ import { isLoggedIn, getStoredMember, storage, STORAGE_KEYS } from '../utils/api
 import axios from 'axios'
 function ReviewDetail({ reviewData, onDelete, productNo }) {
     const navigate = useNavigate();
-
+    
     const {
         reviewNo,
         userNickname,
