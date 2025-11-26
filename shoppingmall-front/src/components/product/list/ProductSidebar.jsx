@@ -17,7 +17,12 @@ const filterOptions = {
     { id: 'pores', label: '모공' }
   ],
 
-  personalColors: [{ id: 'cool', label: '쿨톤' }, { id: 'warm', label: '웜톤' }, { id: 'neutral', label: '뉴트럴톤' }]
+  personalColors: [
+    { id: 'spring', label: '봄 웜톤' }, 
+    { id: 'summer', label: '여름 쿨톤' }, 
+    { id: 'autumn', label: '가을 웜톤' }, 
+    { id: 'winter', label: '겨울 쿨톤' }
+  ]
 };
 
 // 스타일 컴포넌트
@@ -136,12 +141,40 @@ const FilterCheckbox = styled.input.attrs({ type: 'checkbox' })`
   }
 `;
 
+const ProfileToggleButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 25px; /* 아래 필터들과 간격 */
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  /* 활성화 여부에 따른 스타일 */
+  background-color: ${props => props.$active ? '#333' : '#f0f0f0'};
+  color: ${props => props.$active ? '#fff' : '#333'};
+  border: 1px solid ${props => props.$active ? '#333' : '#ddd'};
+
+  &:hover {
+    opacity: 0.9;
+    background-color: ${props => props.$active ? '#444' : '#e0e0e0'};
+  }
+`;
+
 const ProductSidebar = ({
   isOpen,
   onClose,
   closeButtonRef,
   activeFilters,
-  onFilterChange
+  onFilterChange,
+  isLoggedIn,
+  isProfileMode,
+  onProfileToggle
 }) => {
   return (
     <>
@@ -155,6 +188,16 @@ const ProductSidebar = ({
         </CloseButton>
 
         <FilterTitle>필터</FilterTitle>
+
+        {/* 내 피부 맞춤 버튼 */}
+        {isLoggedIn && (
+          <ProfileToggleButton 
+            onClick={onProfileToggle} 
+            $active={isProfileMode}
+          >
+            {isProfileMode ? '✔ 내 피부 맞춤 ON' : '내 피부 맞춤 적용'}
+          </ProfileToggleButton>
+        )}
         
         {/* 피부타입 필터 */}
         <FilterGroup>

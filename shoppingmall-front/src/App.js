@@ -70,8 +70,9 @@ function App() {
             <Route path="/my-activity" element={<MyActivity />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/my-comate" element={<MyCoMate />} />
-            <Route path="/order-detail/:id" element={<OrderDetail />} />
+            <Route path="/order-detail/:orderNo" element={<OrderDetail />} />
             <Route path="/update-reviews/:reviewNo" element={<UpdateReview />} />
+            <Route path="/write-review/:orderItemNo" element={<Review />} />
             {/* 장바구니 관련 */}
             <Route path="/cart" element={<Cart />} />
             {/* 주문 관련 */}
@@ -95,7 +96,7 @@ function App() {
             </Route>
           </Route>
           {/* COMATE 관련 - 다른 사용자 계정 */}
-          <Route path="/comate/user/:userId/:tab?" element={<Comate userType="user"/>} />
+          <Route path="/comate/user/:memNo/:tab?" element={<Comate userType="user" />} />
           {/* 리뷰 관련 */}
           <Route path="/reviews/:orderItemNo" element={<Review/>} />
           <Route path="/update-reviews/:reviewNo" element={<UpdateReview/>} />
