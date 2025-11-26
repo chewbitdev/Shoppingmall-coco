@@ -190,6 +190,12 @@ function ProductListPage() {
   // 상품 목록 조회 (URL 파라미터 변경 감지)
   // ------------------------------------------------------
   useEffect(() => {
+    
+    // 검색어(q)가 존재하면 프로필 모드 강제 해제 (충돌 방지)
+    if (searchTerm) {
+      setIsProfileMode(false);
+    }
+
     const controller = new AbortController();
     const fetchProducts = async () => {
       setIsLoading(true); 
