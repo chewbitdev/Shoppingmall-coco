@@ -47,14 +47,14 @@ public class ComateService {
     		skinTags.add(skinProfile.getPersonalColor());
     	}
     	
-    	boolean isMine = currentMemNo.equals(targetMemNo);
+    	boolean isMine = currentMemNo != null && currentMemNo.equals(targetMemNo);
 
     	int likedCount = likeRepository.countByMember_MemNo(targetMemNo);
         int followerCount = followRepository.countByFollowing_MemNo(targetMemNo);
         int followingCount = followRepository.countByFollower_MemNo(targetMemNo);
         
-        boolean isFollowing = followRepository
-  			   .existsByFollowerMemNoAndFollowingMemNo(currentMemNo, targetMemNo);
+        boolean isFollowing = currentMemNo != null && 
+        						followRepository.existsByFollowerMemNoAndFollowingMemNo(currentMemNo, targetMemNo);
         
         return ProfileDTO.builder()
                 .memNo(member.getMemNo())
@@ -70,7 +70,7 @@ public class ComateService {
     }
     
     // 메인용 - 전체 회원 목록 조회
-    public List<MiniProfileDTO> getAllComates() {
+    public List<MiniProfileDTO> getAllComates(Long currentMemNo) {
     	List<Member> members = memberRepository.findAll();
     	return members.stream().map(member -> {
     		
@@ -81,12 +81,17 @@ public class ComateService {
     		// MiniProfileDTO skinTypes 주석 지워야함
     		// List<String> skinTypes = member.getSkinTypes();
     		
+    		boolean isFollowing = currentMemNo != null &&
+    							followRepository.existsByFollowerMemNoAndFollowingMemNo(currentMemNo, member.getMemNo());
+    		
+    		
     		return MiniProfileDTO.builder()
     				.memNo(member.getMemNo())
     				.memNickname(member.getMemNickname())
     				//.skinTypes(skinTypes)
     				.followerCount(followerCount)
     				.reviewCount(reviewCount)
+    				.isFollowing(isFollowing)
     				.build();
     	}).toList();
     }

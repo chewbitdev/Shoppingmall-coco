@@ -156,7 +156,7 @@ function Cart() {
       <h2 className="order-title">주문하기</h2>
 
       <div className="order-content-area">
-        <OrderSteps currentStep={1} />
+        {/*<OrderSteps currentStep={1} />*/}
 
         <div className="cart-grid">
           {/* 장바구니 */}
