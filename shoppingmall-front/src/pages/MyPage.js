@@ -41,7 +41,6 @@ function MyPage() {
   const menuItems = [
     { icon: "👤", title: "프로필 설정", desc: "피부 프로필 및 회원 정보 수정", path: "/profile-edit" },
     { icon: "📦", title: "주문 내역", desc: "구매한 상품 및 배송 현황 조회", path: "/order-history" },
-    { icon: "💬", title: "내 리뷰", desc: "작성한 리뷰 및 좋아요한 리뷰", path: "/my-activity" },
     { icon: "🤝", title: "Co-mates", desc: "나와 비슷한 피부톤/타입 사용자들", path: "/my-comate" },
     { icon: "⚙️", title: "계정 설정", desc: "비밀번호 변경 및 계정 관리", path: "/account-settings" },
   ];
