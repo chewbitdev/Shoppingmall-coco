@@ -61,12 +61,11 @@ function Home_Comate() {
             try {
                 const data = await getAllComates();
                 setComates(data);
-                console.log("전체회원목록:", data);
 
-                // 팔로우 상태 초기화 (서버에서 following 여부 받아오는 경우)
+                // 팔로우 상태 초기화
                 const status = {};
                 data.forEach(c => {
-                    status[c.memNo] = !!c.following; // following 필드가 있다면
+                    status[c.memNo] = !!c.following;
                 });
                 setFollowStatus(status);
 
@@ -77,6 +76,7 @@ function Home_Comate() {
                 setLoading(false);
             }
         };
+        
         loadComates();
     }, []);
 
