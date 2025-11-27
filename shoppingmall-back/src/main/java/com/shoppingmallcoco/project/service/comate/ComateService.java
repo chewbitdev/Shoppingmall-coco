@@ -77,9 +77,17 @@ public class ComateService {
     		int followerCount = followRepository.countByFollowing_MemNo(member.getMemNo());
     		int reviewCount = reviewRepository.countByOrderItem_Order_Member_MemNo(member.getMemNo());
     		
-    		// 피부타입 아직 구현안됨 (추가예정)
-    		// MiniProfileDTO skinTypes 주석 지워야함
-    		// List<String> skinTypes = member.getSkinTypes();
+    		SkinProfile skinProfile = skinRepository.findByMember_MemNo(member.getMemNo()).orElse(null);
+    		List<String> skinTags = new ArrayList<>();
+    		if (skinProfile != null && skinProfile.getSkinConcern() != null) {
+    			List<String> concern = Arrays.stream(skinProfile.getSkinConcern().split(","))
+										.map(String::trim)
+										.collect(Collectors.toList());
+				
+				skinTags.add(skinProfile.getSkinType());
+				skinTags.addAll(concern);
+				skinTags.add(skinProfile.getPersonalColor());
+    		}
     		
     		boolean isFollowing = currentMemNo != null &&
     							followRepository.existsByFollowerMemNoAndFollowingMemNo(currentMemNo, member.getMemNo());
@@ -88,7 +96,7 @@ public class ComateService {
     		return MiniProfileDTO.builder()
     				.memNo(member.getMemNo())
     				.memNickname(member.getMemNickname())
-    				//.skinTypes(skinTypes)
+    				.skinTags(skinTags)
     				.followerCount(followerCount)
     				.reviewCount(reviewCount)
     				.isFollowing(isFollowing)

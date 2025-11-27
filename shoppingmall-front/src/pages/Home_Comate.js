@@ -132,6 +132,7 @@ function Home_Comate() {
                     <div key={comate.memNo}>
                         <ComateMiniProfile
                             nickname={comate.memNickname}
+                            skinTags={comate.skinTags}
                             followers={comate.followerCount}
                             reviews={comate.reviewCount}
                             isFollowing={followStatus[comate.memNo] || false}

@@ -16,7 +16,7 @@ public class ProfileController {
 
     @PutMapping("/{memNo}")
     public ResponseEntity<?> updateProfile(
-            @PathVariable Long("memNo") memNo,
+            @PathVariable("memNo") Long memNo,
             @RequestBody SkinProfileRequestDto dto) {
 
         profileService.updateProfile(memNo, dto);

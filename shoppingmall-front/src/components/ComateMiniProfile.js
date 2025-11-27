@@ -4,14 +4,14 @@ import '../css/ComateProfile.css';
 import sampleImg_profile from '../images/sampleImg_profile.png'; // 임시 프로필 이미지
 
 
-const ComateMiniProfile = ({nickname, skinTypes, followers, reviews, onFollowClick, onClick, isFollowing}) => {
+const ComateMiniProfile = ({nickname, skinTags, followers, reviews, onFollowClick, onClick, isFollowing}) => {
     return (
         <div className="comate_card mini" onClick={onClick}>
             <div className="profile_section mini">
                 <img src={sampleImg_profile} alt="user_profile" className="profile_img mini" />
                 <div className="nickname mini">{nickname}</div>
                 <div className="skin_types mini">
-                    {skinTypes?.map((type, index) => (
+                    {skinTags?.map((type, index) => (
                         <span key={index}>{type}</span>
                     ))}
                 </div>
