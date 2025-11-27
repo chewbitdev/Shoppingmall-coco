@@ -19,7 +19,6 @@ import NaverLoginCallback from './pages/NaverLoginCallback';
 import MyPage from './pages/MyPage';
 import ProfileEdit from "./pages/ProfileEdit";
 import OrderHistory from "./pages/OrderHistory";
-import MyActivity from './pages/MyActivity';
 import AccountSettings from "./pages/AccountSettings";
 import MyCoMate from './pages/MyCoMate';
 import OrderDetail from "./pages/OrderDetail";
@@ -65,7 +64,6 @@ function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/profile-edit" element={<ProfileEdit />} />
             <Route path="/order-history" element={<OrderHistory />} />
-            <Route path="/my-activity" element={<MyActivity />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/my-comate" element={<MyCoMate />} />
             <Route path="/order-detail/:orderNo" element={<OrderDetail />} />

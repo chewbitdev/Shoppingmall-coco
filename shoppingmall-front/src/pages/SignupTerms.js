@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/SignupTerms.css';
+import SignupTermsPopup from '../components/SignupTermsPopup';
 
 const SignupTerms = () => {
   const navigate = useNavigate();
@@ -8,6 +9,8 @@ const SignupTerms = () => {
   const [serviceAgreed, setServiceAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
+  const [showTermsPopup, setShowTermsPopup] = useState(false);
+  const [termsType, setTermsType] = useState(null);
 
   // 개별 약관 동의 상태에 따라 전체 동의 체크박스 상태 업데이트
   useEffect(() => {
@@ -42,9 +45,16 @@ const SignupTerms = () => {
     }
   };
 
-  // 약관 상세 내용 조회 (구현 예정)
+  // 약관 상세 내용 조회
   const handleViewTerms = (type) => {
-    console.log('약관 보기:', type);
+    setTermsType(type);
+    setShowTermsPopup(true);
+  };
+
+  // 약관 팝업 닫기
+  const handleCloseTermsPopup = () => {
+    setShowTermsPopup(false);
+    setTermsType(null);
   };
 
   return (
@@ -148,6 +158,13 @@ const SignupTerms = () => {
           </div>
         </div>
       </div>
+
+      {showTermsPopup && (
+        <SignupTermsPopup
+          type={termsType}
+          onClose={handleCloseTermsPopup}
+        />
+      )}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { Link,useLocation } from 'react-router-dom';
 import '../../css/OrderResultPage.css'; // 주문 결과 페이지 공용 CSS 사용
 
 // 전역 주문 상태(Context)를 관리하는 훅
-import { useOrder } from '../../pages/OrderContext'; 
+import { useOrder } from '../OrderContext'; 
 
 // 주문 성공 시 주문 완료 정보를 표시하고 다음 행동을 안내하는 컴포넌트
 function OrderSuccessPage() {
