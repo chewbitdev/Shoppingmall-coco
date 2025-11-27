@@ -181,66 +181,80 @@ const Comate = () => {
 
     return (
         <div className="comate_wrapper">
-            <ComateFullProfile
-                nickname={member.memNickname}
-                skinTags={member.skinTags}
-                likes={member.likedCount || 0}
-                followers={member.followerCount || 0}
-                following={member.followingCount || 0}
-                onFollowClick={handleFollowClick}
-                onTabClick={handleTabClick}
-                isMine = {isMine}
-                isFollowing={following}
-            />
-            <ComateContent 
-                activeTab={activeTab}
-                reviewList={reviewList}
-                likeList={likeList}
-                followerList={followerList}
-                followingList={followingList}
-                loginUserNo={loginUser?.memNo}
+            <div className="comate_top">
+                <div className="search_container">
+                    <form>
+                        <input type="text" name="search" placeholder="당신의 CO-MATE 를 찾아보세요!" />
+                        <button type="submit" className="btn_search">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#777777" fillRule="evenodd" d="M15.571 16.631a8.275 8.275 0 1 1 1.06-1.06l4.5 4.498-1.061 1.06-4.499-4.498Zm1.478-6.357a6.775 6.775 0 1 1-13.55 0 6.775 6.775 0 0 1 13.55 0Z" clipRule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div className="comate_main">
+                <ComateFullProfile
+                    nickname={member.memNickname}
+                    skinTags={member.skinTags}
+                    likes={member.likedCount || 0}
+                    followers={member.followerCount || 0}
+                    following={member.followingCount || 0}
+                    onFollowClick={handleFollowClick}
+                    onTabClick={handleTabClick}
+                    isMine = {isMine}
+                    isFollowing={following}
+                />
+                <ComateContent 
+                    activeTab={activeTab}
+                    reviewList={reviewList}
+                    likeList={likeList}
+                    followerList={followerList}
+                    followingList={followingList}
+                    loginUserNo={loginUser?.memNo}
 
-                setReviewList={setReviewList}
-                setLikeList={setLikeList}
-                setFollowerList={setFollowerList}
-                setFollowingList={setFollowingList}
+                    setReviewList={setReviewList}
+                    setLikeList={setLikeList}
+                    setFollowerList={setFollowerList}
+                    setFollowingList={setFollowingList}
 
-                targetMemNo={targetMemNo}
-                
-                onLikeChange={(liked) => {
-                    // 다른 사람의 프로필인 경우 좋아요 상태변화 개수 반영하지 않음
-                    if (targetMemNo !== loginUser?.memNo) return;
+                    targetMemNo={targetMemNo}
+                    
+                    onLikeChange={(liked) => {
+                        // 다른 사람의 프로필인 경우 좋아요 상태변화 개수 반영하지 않음
+                        if (targetMemNo !== loginUser?.memNo) return;
 
-                    setMember(prev => {
-                        if (!prev) return prev;
-                        return {
-                            ...prev,
-                            likedCount: liked 
-                                        ? (prev.likedCount || 0) + 1
-                                        : Math.max((prev.likedCount || 1 ) -1)   
-                        }
-                    });
-                }}
-                
+                        setMember(prev => {
+                            if (!prev) return prev;
+                            return {
+                                ...prev,
+                                likedCount: liked 
+                                            ? (prev.likedCount || 0) + 1
+                                            : Math.max((prev.likedCount || 1 ) -1)   
+                            }
+                        });
+                    }}
+                    
 
-                onListFollowChange={(type, newState) => {
-                    // 리스트에서 팔로우/언팔로우 클릭-> Full Profile count 반영
-                    // targetMember !== loginMember -> count 상태 변경 금지
-                    if (targetMemNo !== loginUser?.memNo) return;
+                    onListFollowChange={(type, newState) => {
+                        // 리스트에서 팔로우/언팔로우 클릭-> Full Profile count 반영
+                        // targetMember !== loginMember -> count 상태 변경 금지
+                        if (targetMemNo !== loginUser?.memNo) return;
 
-                    setMember(prev => {
-                        if (!prev) return prev;
-                        const updated = {...prev};
+                        setMember(prev => {
+                            if (!prev) return prev;
+                            const updated = {...prev};
 
-                        if (type === 'follower') {
-                            updated.followerCount += newState ? 1 : -1;
-                        } else if (type === 'following') {
-                            updated.followingCount += newState ? 1 : -1;
-                        }
-                        return updated;
-                    });
-                }}
-            />
+                            if (type === 'follower') {
+                                updated.followerCount += newState ? 1 : -1;
+                            } else if (type === 'following') {
+                                updated.followingCount += newState ? 1 : -1;
+                            }
+                            return updated;
+                        });
+                    }}
+                />
+            </div>
         </div>
     );   
 }

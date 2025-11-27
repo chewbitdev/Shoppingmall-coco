@@ -1,19 +1,28 @@
-.comate_wrapper {
+.comate_top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+}
+.comate_top .search_container input[type="text"] {
+    width: 400px;
+    font-size: 16px;
+    padding: 15px 20px;
+}
+.comate_main {
     display: flex;
     max-width: 1280px;
     min-height: 450px;
-    margin: 30px auto;
+    margin: 50px auto;
     gap: 80px;
 }
 .comate_card_wrapper {
     margin-left: 100px;
     text-align: center;
-
     position: sticky;
     top: 30px;
     align-self: flex-start;
 }
-
 .comate_content_wrapper {
     width: 100%;
     margin-right: 100px;
