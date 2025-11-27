@@ -25,7 +25,7 @@ const ProductOptionSelector = ({ options, selectedOption, onSelect }) => {
           <option key={opt.optionNo} value={opt.optionNo} disabled={opt.stock <= 0}>
             {opt.optionValue}
             {opt.addPrice > 0 ? ` (+${opt.addPrice.toLocaleString()}원)` : ''}
-            {opt.stock <= 0 ? ' (품절)' : ''}
+            {opt.stock > 0 ? ` (재고: ${opt.stock})` : ' (품절)'}
           </option>
         ))}
       </select>
@@ -34,7 +34,7 @@ const ProductOptionSelector = ({ options, selectedOption, onSelect }) => {
       {isLowStock && (
         <div className="low-stock-alert" style={{ 
           color: '#e74c3c', 
-          fontSize: '13px', 
+          fontSize: '16px', 
           fontWeight: '600', 
           marginTop: '10px',
           display: 'flex',
