@@ -90,22 +90,22 @@ const Comate = () => {
     }, [targetMemNo]);
 
     /* 탭별 데이터 조회 */
+    /* React 18 strict mode - AbortController  */
     useEffect(() => {
         if (!targetMemNo) return;
+
+        const controller = new AbortController();
 
         const loadTabData = async() => {
             try {
                 switch (activeTab) {
                     case 'review' :
-                        const data = await getReviewList(targetMemNo);
-                        setReviewList(data);
-                        console.log("리뷰: ", data);
-                        console.log("targetMemNo:::", targetMemNo);
+                        const review = await getReviewList(targetMemNo, {signal: controller.signal});
+                        setReviewList(review);
+                        console.log(`[Review] 요청 완료 targetMemNo=${targetMemNo}`, review);
                         break;
                     case 'like' :
-                        const like = await getLikedList(targetMemNo);
-                        setLikeList(like);
-                        console.log("좋아요", like);
+                        setLikeList(await getLikedList(targetMemNo));
                         break;
                     case 'follower' :
                         setFollowerList(await getFollowerList(targetMemNo));
@@ -117,12 +117,19 @@ const Comate = () => {
                         break;
                 }
             } catch (error) {
-                console.error(error);
-                alert(`${activeTab} 데이터를 불러오는 중 오류가 발생햇습니다.`);
+                if (error.name === 'AbortError') {
+                    console.log(`[TabData] 요청 취소됨 targetMemNo=${targetMemNo} tab=${activeTab}`);
+                } else {
+                    console.error(error);
+                    alert(`${activeTab} 데이터를 불러오는 중 오류가 발생햇습니다.`);
+                }
             }
         };
 
         loadTabData();
+        return () => {
+            controller.abort();
+        }
     }, [activeTab, targetMemNo]);
 
     /* URL 파라미터 탭 변경 감지 */
