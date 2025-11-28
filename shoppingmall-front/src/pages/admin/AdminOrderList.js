@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Pagination from '../../components/admin/Pagination';
@@ -27,14 +27,29 @@ function AdminOrderList() {
     CANCELLED: "주문취소",
   };
 
+  // 상태별 텍스트 색상 반환 함수
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'CANCELLED': 
+        return '#dc3545'; // 빨강 (취소)
+      case 'DELIVERED': 
+        return '#28a745'; // 초록 (완료)
+      case 'PAID': 
+        return '#007bff'; // 파랑 (결제완료 -> 관리자 작업 시작)
+      case 'PREPARING':
+      case 'SHIPPING': 
+        return '#fd7e14'; // 주황 (진행중)
+      case 'PENDING': 
+        return '#6c757d'; // 회색 (대기)
+      default: 
+        return '#333';    // 기본 검정
+    }
+  };
+
   // 주문 상태 옵션
   const statusOptions = Object.keys(statusMap);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [currentPage]);
-
-  const fetchOrders = async (resetPage = false) => {
+  const fetchOrders = useCallback(async (resetPage = false) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -59,7 +74,12 @@ function AdminOrderList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchStatus, searchTerm]);
+
+  // useEffect 의존성에 fetchOrders 추가
+  useEffect(() => {
+    fetchOrders(); 
+  }, [fetchOrders]);
 
   // 검색 버튼 핸들러
   const handleSearch = () => {
@@ -182,9 +202,8 @@ function AdminOrderList() {
                           padding: '6px',
                           borderRadius: '4px',
                           border: '1px solid #ddd',
-                          color: order.status === 'CANCELLED' ? 'red' :
-                            order.status === 'DELIVERED' ? 'green' : '#333',
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          color: getStatusColor(order.status)
                         }}
                       >
                         {statusOptions.map(key => (
