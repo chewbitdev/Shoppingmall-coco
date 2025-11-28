@@ -74,6 +74,8 @@ public class WebSecurityConfig {
 					"/api/member/delete",
 					"/api/mypage"
 				).authenticated()
+				// 로그인된 사용자만 접근할 수 있는 장바구니 및 프로필 API
+				.requestMatchers("/api/coco/members/**").authenticated()
 				// 관리자만 접근할 수 있는 API
 				.requestMatchers("/api/member/admin/**").authenticated()
 				// 나머지 요청은 모두 허용 (추후 필요 시 제한 추가)
