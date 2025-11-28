@@ -45,7 +45,7 @@ const ComateFollowListCard = ({
                 <img src={sampleImg_profile} alt={nickname} className="profile_img"/>
                 <div className="uc_info">
                     <div className="nickname">{nickname}</div>
-                    <div className="skin_types">
+                    <div className="skin_types follow_list">
                         {skinTags?.map((type, index) => (
                             <span key={index}>{type}</span>
                         ))}
