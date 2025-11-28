@@ -39,6 +39,7 @@ import OrderFailPage from './pages/OrderFailPage/OrderFailPage';
 import { OrderProvider } from './pages/OrderContext';
 import CreateReviewwPage from "./features/CreateReviewPage.js";
 import CreateUpdatePage from "./features/CreateUpdatePage.js";
+import TermsPage from './pages/TermsPage';
 
 function App() {
   const location = useLocation();
@@ -101,6 +102,8 @@ function App() {
           {/* 상품 관련 */}
           <Route path="/product" element={<ProductListPage />} />
           <Route path="/products/:productId" element={<ProductDetailPage />} />
+          {/* 약관 관련 */}
+          <Route path="/terms/:type" element={<TermsPage />} />
         </Routes>
         {!hideHeaderFooter && <Footer />}
       </div>
