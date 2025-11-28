@@ -218,3 +218,44 @@
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* === 아이콘 버튼 스타일 === */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin: 0 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.icon-btn img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.icon-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.icon-btn.edit:hover {
+  background-color: #e3f2fd; /* 파란색 틴트 */
+}
+
+.icon-btn.delete:hover {
+  background-color: #ffebee; /* 빨간색 틴트 */
+}
+
+/* 모든 관리자 테이블의 헤더 스타일 통일 */
+.admin-table th, .category-table th {
+  background: #f9f9f9;
+  border-bottom: 2px solid #eee;
+  padding: 12px;
+  font-weight: 600;
+  color: #333;
+}
