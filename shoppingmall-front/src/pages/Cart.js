@@ -62,7 +62,7 @@ function Cart() {
     .reduce((total, item) => total + item.productPrice * item.cartQty, 0);
    
   //배송비
-  const shippingFee = selectedTotalPrice >= 30000 ? 0 : 3000;
+  const shippingFee = selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0;
   // 수량 변경
   const updateQuantity = (cartNo, newQty) => {
     axios
@@ -157,9 +157,6 @@ function Cart() {
    //  선택된 상품 목록 추출
   const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.cartNo));
   
-  
- 
-
     navigate("/order", {
       state: {
         orderItems: selectedCartItems,
@@ -298,20 +295,16 @@ function Cart() {
             {/* 선택된 금액 기준 배송비 산정 */}
             <div className="summary-row">
               <span>배송비</span>
-              <strong>
-                {(selectedTotalPrice >= 30000 ? 0 : 3000).toLocaleString()}원
-              </strong>
+                <strong>
+                  {(selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0).toLocaleString()}원
+                </strong>
             </div>
 
             {/* 총 구매 금액 */}
             <div className="summary-row total">
               <span>총 구매 금액</span>
               <strong>
-                {(
-                  selectedTotalPrice +
-                  (selectedTotalPrice >= 30000 ? 0 : 3000)
-                ).toLocaleString()}
-                원
+                {(selectedTotalPrice +(selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0)).toLocaleString()}원
               </strong>
             </div>
 
