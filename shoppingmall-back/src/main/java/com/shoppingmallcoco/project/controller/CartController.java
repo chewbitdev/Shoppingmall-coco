@@ -43,7 +43,7 @@ public class CartController {
     }
 
     // 장바구니 전체 비우기
-    @DeleteMapping("/items/clear")
+    @DeleteMapping("/items")
     public void clearCart() {
         cartService.clearCart();
     }

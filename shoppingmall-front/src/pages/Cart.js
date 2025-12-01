@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../css/Cart.css";
-import { getStoredMember } from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { useOrder } from "./OrderContext";
 
 function Cart() {
-  const [cartItems, setCartItems] = useState([]);
+  const { cartItems, setCartItems } = useOrder();
   const [selectedItems, setSelectedItems] = useState([]);
 
   const navigate = useNavigate();
@@ -29,10 +29,10 @@ function Cart() {
       .then((res) => {
         setCartItems(res.data);
         setSelectedItems(res.data.map((item) => item.cartNo)); // 초기 전체 선택
-        window.dispatchEvent(new Event("cartUpdated"));
+        
       })
       .catch((err) => console.error("장바구니 불러오기 실패:", err));
-  }, [token]);
+  }, [token, setCartItems]);
 
   // 체크박스 로직
   const toggleSelectItem = (cartNo) => {
@@ -42,6 +42,8 @@ function Cart() {
         : [...prev, cartNo]
     );
   };
+
+ 
 
   const selectAll = () => {
     setSelectedItems(cartItems.map((item) => item.cartNo));
@@ -58,7 +60,13 @@ function Cart() {
   const selectedTotalPrice = cartItems
     .filter((item) => selectedItems.includes(item.cartNo))
     .reduce((total, item) => total + item.productPrice * item.cartQty, 0);
-
+  //총 상품 금액 계산
+    const totalPrice = cartItems.reduce(
+    (total, item) => total + item.productPrice * item.cartQty,
+    0
+); 
+  //배송비
+  const shippingFee = selectedTotalPrice >= 30000 ? 0 : 3000;
   // 수량 변경
   const updateQuantity = (cartNo, newQty) => {
     axios
@@ -107,7 +115,7 @@ function Cart() {
       .then(() => {
         setCartItems((prev) => prev.filter((i) => i.cartNo !== cartNo));
         setSelectedItems((prev) => prev.filter((id) => id !== cartNo));
-        window.dispatchEvent(new Event("cartUpdated"));
+        
       })
       .catch((err) => console.error("삭제 실패:", err));
   };
@@ -139,7 +147,7 @@ function Cart() {
           prev.filter((item) => !selectedItems.includes(item.cartNo))
         );
         setSelectedItems([]);
-        window.dispatchEvent(new Event("cartUpdated"));
+        
       })
       .catch((err) => console.error("선택 삭제 실패:", err));
   };
@@ -153,9 +161,8 @@ function Cart() {
    //  선택된 상품 목록 추출
   const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.cartNo));
   
-  //  최종 금액 계산
-  const subtotal = selectedTotalPrice;
-  const fee = shippingFee; // 이미 계산된 값 사용
+  
+ 
 
   //  React Router의 state를 이용해 데이터 전달
   navigate("/order", { 

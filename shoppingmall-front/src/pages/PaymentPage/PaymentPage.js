@@ -16,7 +16,8 @@ function PaymentPage() {
     userPoints,    // 사용자 보유 포인트
     pointsToUse, setPointsToUse, // 사용할 포인트 상태
     lastName, firstName, phone, postcode, address, addressDetail, deliveryMessage, // 배송지 정보
-    orderItems
+    orderItems,
+    setCartItems
   } = useOrder();
 
   useEffect(() => {
@@ -141,11 +142,35 @@ function PaymentPage() {
               const realOrderNo = response.data; 
               console.log("백엔드 저장 성공. 주문번호:", realOrderNo);
 
-              alert("주문이 성공적으로 완료되었습니다!");
+              // 장바구니 비우기 로직 
+              return axios.delete('http://localhost:8080/api/coco/members/cart/items', {
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                  }
+              })
               
-              //  성공 페이지로 이동하며 주문 번호를 state로 전달
-              navigate('/order-success', { state: { orderNo: realOrderNo } }); 
+              // 성공-장바구니 비우기 성공 및 최종 이동
+              .then(() => {
+                  console.log("장바구니 비우기 성공. FE 상태 초기화.");
+                  
+                  // Context 상태 초기화
+                  if (setCartItems) { 
+                      setCartItems([]); 
+                  }
+                  
+                  alert("주문이 성공적으로 완료되었습니다!");
+                  // 최종 성공 페이지로 이동하며 주문 번호 전달
+                  navigate('/order-success', { state: { orderNo: realOrderNo } });
+              })
+              
+              // 실패-장바구니 비우기 실패 (주문은 성공했으므로 이동)
+              .catch((cartError) => {
+                  // 실패 시 알림 없이 콘솔에만 로그를 남기고 성공 처리
+                  console.error("장바구니 비우기 실패 (하지만 주문은 성공됨):", cartError);
+                  navigate('/order-success', { state: { orderNo: realOrderNo } });
+              });
             })
+
             .catch((error) => {
               console.error("백엔드 저장 실패:", error);
               

@@ -18,6 +18,7 @@ export function OrderProvider({ children }) {
   const [addressDetail, setAddressDetail] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [orderItems, setOrderItems] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
 
   // --- 2. PaymentPage (금액) state ---
   const [orderSubtotal, setOrderSubtotal] = useState(0); // (임시) 상품 금액
@@ -80,6 +81,7 @@ export function OrderProvider({ children }) {
     userPoints, setUserPoints,
     pointsToUse, setPointsToUse,
     orderItems, setOrderItems,
+    cartItems, setCartItems,
   };
 
   return (
