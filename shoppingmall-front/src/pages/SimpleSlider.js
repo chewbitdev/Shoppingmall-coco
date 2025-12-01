@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '../css/SimpleSlider.css';
+
 import bannerImgSkincare from '../images/banner/banner_skincare_bg.png';
 import bannerImgMakeup from '../images/banner/banner_makeup_bg.png';
 import bannerImgBody from '../images/banner/banner_body_bg.png';
@@ -18,79 +19,86 @@ function SimpleSlider() {
         autoplay: true,
         slidesToShow: 1,
         slidesToScroll: 1,
-        centerPadding: '20px'
+        arrows: true
     };
+
+    // 슬라이드 데이터 배열
+    const slides = [
+        {
+            id: 'skincare',
+            bg: bannerImgSkincare,
+            title: <>촉촉하게 차오르는<br/>수분 광채</>,
+            desc: <>건조한 피부에 즉각적인 생기를 더하는<br/>코코의 수분 솔루션</>,
+            link: '/product?categoryNo=1',
+            btnText: '스킨케어 라인 보기 >',
+            contentClass: 'align-right theme-skincare',
+            btnClass: 'btn-round btn-skincare'
+        },
+        {
+            id: 'makeup',
+            bg: bannerImgMakeup,
+            title: <>설렘 가득,<br/>메이크업</>,
+            desc: <>당신의 일상을 화사하게 밝혀줄<br/>코코의 로맨틱 컬렉션</>,
+            link: '/product?categoryNo=2',
+            btnText: '메이크업 라인 보기 >',
+            contentClass: 'align-right theme-makeup',
+            boxClass: 'glass-box', // 반투명 박스 사용
+            btnClass: 'btn-round btn-makeup'
+        },
+        {
+            id: 'body',
+            bg: bannerImgBody,
+            title: <>일상 속 작은 쉼표,<br/>내추럴 바디 케어</>,
+            desc: <>지친 몸과 마음에 전하는<br/>자연의 깊은 위로</>,
+            link: '/product?categoryNo=3',
+            btnText: '바디/헤어 라인 보기 >',
+            contentClass: 'align-right theme-body',
+            boxClass: 'glass-box text-left', // 박스는 오른쪽이지만 텍스트는 왼쪽 정렬
+            btnClass: 'btn-square btn-body'
+        },
+        {
+            id: 'homme',
+            bg: bannerImgHomme,
+            title: <>그 남자의 관리법,<br/>코코 옴므</>,
+            desc: '복잡한 단계 없이, 심플하고 완벽하게',
+            link: '/product?categoryNo=4',
+            btnText: '옴므 라인 보기 >',
+            contentClass: 'align-right theme-homme',
+            btnClass: 'btn-square btn-homme'
+        }
+    ];
+
     return (
-        <div className="slider_container">
+       <div className="slider_container">
             <Slider {...settings}>
-                {/* 1번째 슬라이드 (스킨케어) */}
-                <div>
-                    <div 
-                        className="slide page1 skincare-slide"
-                        style={{ backgroundImage: `url(${bannerImgSkincare})` }}
-                    >
-                        <div className="banner-content-skincare">
-                            <h3>촉촉하게 차오르는<br/>수분 광채</h3>
-                            <p>건조한 피부에 즉각적인 생기를 더하는<br/>코코의 수분 솔루션</p>
-                            {/* 스킨케어 카테고리(예: categoryNo=1)로 이동 */}
-                            <Link to="/product?categoryNo=1" className="btn-skincare-link">
-                                스킨케어 라인 보기 &gt;
-                            </Link>
+                {slides.map((slide, index) => (
+                    <div key={index}>
+                        <div 
+                            className="slide"
+                            style={{ backgroundImage: `url(${slide.bg})` }}
+                        >
+                            <div className={`banner-content ${slide.contentClass}`}>
+                                {slide.boxClass ? (
+                                    <div className={slide.boxClass}>
+                                        <h3>{slide.title}</h3>
+                                        <p>{slide.desc}</p>
+                                        <Link to={slide.link} className={`banner-btn ${slide.btnClass}`}>
+                                            {slide.btnText}
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h3>{slide.title}</h3>
+                                        <p>{slide.desc}</p>
+                                        <Link to={slide.link} className={`banner-btn ${slide.btnClass}`}>
+                                            {slide.btnText}
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* 2번째 슬라이드 (메이크업) */}
-                <div>
-                    <div 
-                        className="slide page2 makeup-slide"
-                        style={{ backgroundImage: `url(${bannerImgMakeup})` }}
-                    >
-                        <div className="banner-content-makeup">
-                            <h3>설렘 가득,<br/>메이크업</h3>
-                            <p>당신의 일상을 화사하게 밝혀줄<br/>코코의 로맨틱 컬렉션</p>
-                            {/* 메이크업 카테고리(categoryNo=2)로 이동 */}
-                            <Link to="/product?categoryNo=2" className="btn-makeup-link">
-                                메이크업 라인 보기 &gt;
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 3번째 슬라이드 (바디케어) */}
-                <div>
-                    <div 
-                        className="slide page3 body-slide"
-                        style={{ backgroundImage: `url(${bannerImgBody})` }}
-                    >
-                        <div className="banner-content-body">
-                            <h3>일상 속 작은 쉼표,<br/>내추럴 바디 케어</h3>
-                            <p>지친 몸과 마음에 전하는<br/>자연의 깊은 위로</p>
-                            {/* 바디케어 카테고리(예: categoryNo=3)로 이동 */}
-                            <Link to="/product?categoryNo=3" className="btn-body-link">
-                                바디/헤어 라인 보기 &gt;
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 4번째 슬라이드 (옴므) */}
-                <div>
-                    <div
-                        className="slide page4 homme-slide"
-                        style={{ backgroundImage: `url(${bannerImgHomme})` }}
-                    >
-                        {/* 텍스트 내용을 감싸는 컨테이너 */}
-                        <div className="banner-content-right">
-                            <h3>그 남자의 관리법,<br />코코 옴므</h3>
-                            <p>복잡한 단계 없이, 심플하고 완벽하게</p>
-                            {/* 버튼 클릭 시 옴므 카테고리(예: categoryNo=4)로 이동 */}
-                            <Link to="/product?categoryNo=4" className="btn-banner-link">
-                                옴므 라인 보기 &gt;
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+                ))}
             </Slider>
         </div>
     );
