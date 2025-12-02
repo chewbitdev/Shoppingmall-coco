@@ -172,7 +172,7 @@ public class ComateController {
     	return ResponseEntity.ok(comateService.getAllComates(currentMemNo));
     }
     
-    // 추천 상품 조회
+    // 추천 상품/리뷰/유저 조회
     @GetMapping("/recommend")
     public RecommendResponseDTO getRecommendation(HttpServletRequest request) {
     	Long loginUserNo = getCurrentMemNo(request);
