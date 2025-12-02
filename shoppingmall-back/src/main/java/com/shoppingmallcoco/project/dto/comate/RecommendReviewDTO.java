@@ -1,5 +1,8 @@
 package com.shoppingmallcoco.project.dto.comate;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.*;
 
 @Getter
@@ -13,10 +16,14 @@ public class RecommendReviewDTO {
 
     private Long productNo;
     private String productName;
+    private String productOption;
+    private String productImg;
     
     private Long authorNo;
     private String authorNickname;
     
-    private String reason;
+    private Integer rating;
+    private String content;
+    private LocalDateTime createdAt;
     
 }

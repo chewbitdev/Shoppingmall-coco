@@ -8,8 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 public class RecommendPrdDTO {
 
-	private Long prdNo;
-	private String prdName;
-	private String reason; // 추천이유 (팔로우 또는 매칭률)
+	private Long productNo;
+	private String productName;
+	private int productPrice;
+	private String productImg;
 	
 }

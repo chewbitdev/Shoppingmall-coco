@@ -11,5 +11,6 @@ public class RecommendUserDTO {
 
 	private Long memNo;
 	private String nickname;
+	private Integer matchingRate;
 	
 }
