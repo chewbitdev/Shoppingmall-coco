@@ -201,6 +201,7 @@ public class OrderService {
                 .orderZipcode(order.getOrderZipcode())
                 .orderAddress1(order.getOrderAddress1())
                 .orderAddress2(order.getOrderAddress2())
+                .pointsUsed(order.getPointsUsed())
                 .items(items)
                 .build();
     }
