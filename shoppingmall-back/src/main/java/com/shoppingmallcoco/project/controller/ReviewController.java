@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
@@ -59,7 +62,23 @@ public class ReviewController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
             }
             for (MultipartFile file : files) {
+                if (file.isEmpty()) {
+                    continue;
+                }
+                // 파일 크기 검증
                 if (file.getSize() > 10 * 1024 * 1024) { // 10MB
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
+                }
+                // 파일 타입 검증 (이미지 파일만 허용)
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
+                }
+                // 허용된 이미지 타입만 허용
+                List<String> allowedTypes = Arrays.asList(
+                    "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
+                );
+                if (!allowedTypes.contains(contentType.toLowerCase())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
                 }
             }
