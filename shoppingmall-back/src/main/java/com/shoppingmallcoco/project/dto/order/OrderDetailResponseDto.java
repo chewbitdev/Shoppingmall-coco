@@ -23,6 +23,7 @@ public class OrderDetailResponseDto {
     private String orderZipcode;
     private String orderAddress1;
     private String orderAddress2;
+    private Long pointsUsed;
 
     private List<OrderItemDto> items;
 

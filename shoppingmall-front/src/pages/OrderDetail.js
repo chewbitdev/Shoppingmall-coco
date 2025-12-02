@@ -112,26 +112,36 @@ return (
 
       <div className="price-row">
         <span>상품 금액</span>
-        <span>{order.totalPrice.toLocaleString()}원</span>
+        <span>{Number(order.totalPrice || 0).toLocaleString()}원</span>
       </div>
 
-      {order.pointsUsed > 0 && (
-        <div className="price-row">
-          <span>적립금 사용</span>
-          <span>-{order.pointsUsed.toLocaleString()}원</span>
-        </div>
-      )}
+      <div className="price-row">
+        <span>적립금 사용</span>
+        <span>{Number(order.pointsUsed || 0).toLocaleString()}원</span>
+      </div>
+
+      <div className="price-row">
+        <span>배송비</span>
+        <span>{Number(order.deliveryFee || 0).toLocaleString()}원</span>
+      </div>
 
       <div className="price-total">
         <strong>결제 금액</strong>
-        <strong>{(order.totalPrice - (order.pointsUsed || 0)).toLocaleString()}원</strong>
+        <strong>
+          {(
+            Number(order.totalPrice || 0) -
+            Number(order.pointsUsed || 0) +
+            Number(order.deliveryFee || 0)
+          ).toLocaleString()}원
+        </strong>
       </div>
     </div>
 
     <button className="list-btn" onClick={() => navigate("/order-history")}>
       목록
     </button>
-  </div>
+
+  </div> 
 );
 }
 

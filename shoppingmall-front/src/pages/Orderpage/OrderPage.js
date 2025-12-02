@@ -244,7 +244,7 @@ useEffect(() => {
               결제 정보 입력
             </button>
             {/* 이전 단계로 돌아가는 보조 버튼 (장바구니) */}
-            <button type="button" className="btn-secondary">이전 단계</button>
+            <button type="button" className="btn-secondary" onClick={() => navigate("/cart")}>이전 단계</button>
           </div>
         </div>
       </div>
