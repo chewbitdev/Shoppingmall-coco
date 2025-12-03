@@ -56,58 +56,81 @@ public class RecommendationService {
     
     /* 추천 상품 */
     public List<RecommendPrdDTO> recommendProduct(Long loginUserNo) {
+    	
+    	List<RecommendPrdDTO> result = new ArrayList<>();
+    	
         if (skinRepository.findByMember_MemNo(loginUserNo).isEmpty()) {
-            return fallbackProduct();
+            return fallbackProducts();
         }
         
-        List<Member> followingUsers = followRepository.findFollowingInfo(loginUserNo)
-                .stream()
-                .map(dto -> new Member(dto.getMemNo(), dto.getNickname()))
-                .collect(Collectors.toList());
+        // 1 팔로우한 유저가 구매한 상품
+        List<ProductEntity> followProducts = getProductsFromFollowing(loginUserNo);
+        addProducts(result, followProducts);
         
-        if (followingUsers.isEmpty()) return fallbackProduct();
+        // 2 8개 미만인 경우-> 매칭률 높은 사용자가 구매한 상품 추가
+        if (result.size() < RANDOM_PRODUCT) {
+        	List<ProductEntity> matchedProducts = getProductsFromMatchedUsers(loginUserNo);
+        	addProducts(result, matchedProducts);
+        }
         
-        List<Member> highFollow = followingUsers.stream()
-                .filter(u -> matchingService.getUserMatch(loginUserNo, u.getMemNo()) >= HIGH_MATCH)
-                .collect(Collectors.toList());
-        if (!highFollow.isEmpty()) return getProductsFromUsers(highFollow);
-
-        List<Member> mediumFollow = followingUsers.stream()
-                .filter(u -> {
-                    int rate = matchingService.getUserMatch(loginUserNo, u.getMemNo());
-                    return MEDIUM_MATCH <= rate && rate < HIGH_MATCH;
-                })
-                .collect(Collectors.toList());
-        if (!mediumFollow.isEmpty()) return getProductsFromUsers(mediumFollow);
+        // 3 그래도 부족한 경우-> 최근 등록 상품 추가
+        if (result.size() < RANDOM_PRODUCT) {
+        	List<ProductEntity> recent = productRepository.findRecentProducts(PageRequest.of(0, RANDOM_PRODUCT));
+        	addProducts(result, recent);
+        }
         
-        return fallbackProduct();
+        return result.stream().limit(RANDOM_PRODUCT).collect(Collectors.toList());
     }
     
-    /* 추천 상품 목록 생성 */
-    private List<RecommendPrdDTO> getProductsFromUsers(List<Member> users) {
-        Set<ProductEntity> productSet = new HashSet<>();
-        for (Member u : users) {
-            orderRepository.findAllByMemberMemNoOrderByOrderNoDesc(u.getMemNo())
+    /* 팔로우한 사람이 구매한 상품 */
+    private List<ProductEntity> getProductsFromFollowing(Long loginUserNo) {
+    	
+    	List<Member> following = followRepository.findFollowingInfo(loginUserNo)
+    			.stream()
+    			.map(dto -> new Member(dto.getMemNo(), dto.getNickname()))
+    			.collect(Collectors.toList());
+    	
+    	if (following.isEmpty())	return List.of();
+    	
+        Set<ProductEntity> set = new HashSet<>();
+        for (Member user : following) {
+            orderRepository.findAllByMemberMemNoOrderByOrderNoDesc(user.getMemNo())
                     .forEach(o -> o.getOrderItems()
-                            .forEach(oi -> productSet.add(oi.getProduct())));
+                            .forEach(oi -> set.add(oi.getProduct())));
         }
         
-        List<ProductEntity> shuffled = new ArrayList<>(productSet);
-        Collections.shuffle(shuffled);
-        return shuffled.stream()
-                .limit(RANDOM_PRODUCT)
-                .map(p -> RecommendPrdDTO.builder()
-                        .productNo(p.getPrdNo())
-                        .productName(p.getPrdName())
-                        .productPrice(p.getPrdPrice())
-                        .productImg(getMainImageUrl(p))
-                        .build())
-                .collect(Collectors.toList());
+        List<ProductEntity> list = new ArrayList<>(set);
+        Collections.shuffle(list);
+        return list;
     }
     
-    /* 스킨 프로필 없는 유저 fallback */
-    private List<RecommendPrdDTO> fallbackProduct() {
-        List<ProductEntity> recent = productRepository.findRecentProducts(PageRequest.of(0, 5));
+    /* 매칭률 높은 유저가 구매한 상품 */
+    private List<ProductEntity> getProductsFromMatchedUsers(Long loginUserNo) {
+    	
+    	List<Member> allUsers = followRepository.findAllMembersExcluding(loginUserNo);
+    	
+    	List<Member> matched = allUsers.stream()
+    			.filter(u -> matchingService.getUserMatch(loginUserNo, u.getMemNo()) >= HIGH_MATCH)
+    			.collect(Collectors.toList());
+    	
+    	if (matched.isEmpty())	return List.of();
+    	
+    	Set<ProductEntity> set = new HashSet<>();
+        for (Member user : matched) {
+            orderRepository.findAllByMemberMemNoOrderByOrderNoDesc(user.getMemNo())
+                    .forEach(o -> o.getOrderItems()
+                            .forEach(oi -> set.add(oi.getProduct())));
+        }
+
+        List<ProductEntity> list = new ArrayList<>(set);
+        Collections.shuffle(list);
+        return list;
+    }
+    
+    /* 최근 상품 fallback (8개 고정) */
+    private List<RecommendPrdDTO> fallbackProducts() {
+        List<ProductEntity> recent = productRepository.findRecentProducts(PageRequest.of(0, RANDOM_PRODUCT));
+
         return recent.stream()
                 .map(p -> RecommendPrdDTO.builder()
                         .productNo(p.getPrdNo())
@@ -118,35 +141,101 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
     
-    /* 리뷰 추천 */
+    /* 상품 리스트에 추가 */
+    private void addProducts(List<RecommendPrdDTO> result, List<ProductEntity> products) {
+        for (ProductEntity p : products) {
+            if (result.size() >= RANDOM_PRODUCT) break;
+
+            boolean exists = result.stream()
+                    .anyMatch(dto -> dto.getProductNo().equals(p.getPrdNo()));
+
+            if (!exists) {
+                result.add(RecommendPrdDTO.builder()
+                        .productNo(p.getPrdNo())
+                        .productName(p.getPrdName())
+                        .productPrice(p.getPrdPrice())
+                        .productImg(getMainImageUrl(p))
+                        .build());
+            }
+        }
+    }
+    
+    /* 추천 리뷰 */
     private List<RecommendReviewDTO> recommendReview(Long loginUserNo) {
+    	
+    	List<RecommendReviewDTO> result = new ArrayList<>();
+    	
+    	// 1 팔로우한 사람의 리뷰
+    	List<Review> followReviews = getReviewsFromFollowing(loginUserNo);
+    	addReview(result, followReviews);
+    	
+    	// 2 2개 미만인 경우-> 매칭률 높은 사용자 리뷰 추가
+    	if (result.size() < RANDOM_REVIEW) {
+    		List<Review> matchedReviews = getReviewsFromMatchedUsers(loginUserNo);
+    		addReview(result, matchedReviews);
+    	}
+    	
+    	// 3 그래도 부족한 경우-> 최근 등록 리뷰
+		if (result.size() < RANDOM_REVIEW) {
+			List<Review> recentReviews = reviewRepository.findRecentReviews(PageRequest.of(0, 10));
+		    addReview(result, recentReviews);
+    	}
+		
+		return result.stream().limit(RANDOM_REVIEW).collect(Collectors.toList());
+    
+    }
+    
+    /* 팔로우한 사람이 작성한 리뷰 */
+    private List<Review> getReviewsFromFollowing(Long loginUserNo) {
+
         List<Member> following = followRepository.findFollowingInfo(loginUserNo)
                 .stream()
                 .map(dto -> new Member(dto.getMemNo(), dto.getNickname()))
                 .collect(Collectors.toList());
-        
-        List<Review> reviewPool = new ArrayList<>();
+
+        if (following.isEmpty()) return List.of();
+
+        List<Review> list = new ArrayList<>();
         for (Member f : following) {
             reviewRepository.findByOrderItem_Order_Member_MemNoOrderByCreatedAtDesc(f.getMemNo())
-                .forEach(reviewPool::add);
+                    .forEach(list::add);
         }
-        
+
+        Collections.shuffle(list);
+        return list;
+    }
+
+    /* 매칭률 높은 유저가 작성한 리뷰 */
+    private List<Review> getReviewsFromMatchedUsers(Long loginUserNo) {
+
         List<Member> allUsers = followRepository.findAllMembersExcluding(loginUserNo);
-        List<Member> highMatchUsers = allUsers.stream()
+
+        List<Member> matched = allUsers.stream()
                 .filter(u -> matchingService.getUserMatch(loginUserNo, u.getMemNo()) >= HIGH_MATCH)
                 .collect(Collectors.toList());
-        
-        for (Member u : highMatchUsers) {
+
+        if (matched.isEmpty()) return List.of();
+
+        List<Review> list = new ArrayList<>();
+        for (Member u : matched) {
             reviewRepository.findByOrderItem_Order_Member_MemNoOrderByCreatedAtDesc(u.getMemNo())
-                .forEach(reviewPool::add);
+                    .forEach(list::add);
         }
-        
-        List<Review> shuffled = new ArrayList<>(reviewPool);
-        Collections.shuffle(shuffled);
-        
-        return shuffled.stream()
-                .limit(RANDOM_REVIEW)
-                .map(r -> RecommendReviewDTO.builder()
+
+        Collections.shuffle(list);
+        return list;
+    }
+    
+    /* 리뷰 리스트에 추가 */
+    private void addReview(List<RecommendReviewDTO> result, List<Review> reviews) {
+        for (Review r : reviews) {
+            if (result.size() >= RANDOM_REVIEW) break;
+
+            boolean exists = result.stream()
+                    .anyMatch(dto -> dto.getReviewNo().equals(r.getReviewNo()));
+
+            if (!exists) {
+                result.add(RecommendReviewDTO.builder()
                         .reviewNo(r.getReviewNo())
                         .productNo(r.getOrderItem().getProduct().getPrdNo())
                         .productName(r.getOrderItem().getProduct().getPrdName())
@@ -156,9 +245,12 @@ public class RecommendationService {
                         .rating(r.getRating())
                         .content(r.getContent())
                         .createdAt(r.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()
+                );
+            }
+        }
     }
+
     
     /* 팔로우하지 않은 유저 추천 */
     private List<RecommendUserDTO> recommendUser(Long loginUserNo) {
