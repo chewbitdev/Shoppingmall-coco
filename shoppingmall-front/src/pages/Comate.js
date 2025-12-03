@@ -28,7 +28,7 @@ const Comate = () => {
     const [targetMemNo, setTargetMemNo] = useState(null);
     const [userType, setUserType] = useState('user');
 
-    const [activeTab, setActiveTab] = useState(tab ||  'recommend');
+    const [activeTab, setActiveTab] = useState(tab || 'recommend');
     const [member, setMember] = useState(null);
     const [following, setFollowing] = useState(false);
     const [loading, setLoading] = useState(true);
