@@ -19,7 +19,6 @@ import NaverLoginCallback from './pages/NaverLoginCallback';
 import MyPage from './pages/MyPage';
 import ProfileEdit from "./pages/ProfileEdit";
 import OrderHistory from "./pages/OrderHistory";
-import MyActivity from './pages/MyActivity';
 import AccountSettings from "./pages/AccountSettings";
 import MyCoMate from './pages/MyCoMate';
 import OrderDetail from "./pages/OrderDetail";
@@ -33,13 +32,18 @@ import AdminProductNew from './pages/admin/AdminProductNew';
 import AdminProductEdit from './pages/admin/AdminProductEdit';
 import AdminCategoryList from './pages/admin/AdminCategoryList';
 import AdminMemberList from './pages/admin/AdminMemberList';
+import AdminOrderList from './pages/admin/AdminOrderList';
 import OrderPage from './pages/Orderpage/OrderPage';
 import PaymentPage from './pages/PaymentPage/PaymentPage';
 import OrderSuccessPage from './pages/OrderSuccessPage/OrderSuccessPage';
 import OrderFailPage from './pages/OrderFailPage/OrderFailPage';
 import { OrderProvider } from './pages/OrderContext';
-import CreateReviewwPage from "./features/CreateReviewPage.js";
-import CreateUpdatePage from "./features/CreateUpdatePage.js";
+import TermsPage from './pages/TermsPage';
+import NotFound from './pages/error/NotFound';
+import Forbidden from './pages/error/Forbidden';
+import NoticePage from './pages/NoticePage';
+import EventPage from './pages/EventPage';
+import ProductStopped from './pages/error/ProductStopped';
 
 function App() {
   const location = useLocation();
@@ -67,7 +71,6 @@ function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/profile-edit" element={<ProfileEdit />} />
             <Route path="/order-history" element={<OrderHistory />} />
-            <Route path="/my-activity" element={<MyActivity />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/my-comate" element={<MyCoMate />} />
             <Route path="/order-detail/:orderNo" element={<OrderDetail />} />
@@ -93,6 +96,7 @@ function App() {
               <Route path="product/edit/:productId" element={<AdminProductEdit />} />
               <Route path="categories" element={<AdminCategoryList />} />
               <Route path="members" element={<AdminMemberList />} />
+              <Route path="orders" element={<AdminOrderList />} />
             </Route>
           </Route>
           {/* COMATE 관련 - 다른 사용자 계정 */}
@@ -103,6 +107,22 @@ function App() {
           {/* 상품 관련 */}
           <Route path="/product" element={<ProductListPage />} />
           <Route path="/products/:productId" element={<ProductDetailPage />} />
+          {/* 약관 관련 */}
+          <Route path="/terms/:type" element={<TermsPage />} />
+
+          {/* 에러 페이지 라우트 */}
+          <Route path="/error/403" element={<Forbidden />} />
+          <Route path="/product-stopped" element={<ProductStopped />} />
+
+          {/* 404 에러 페이지 라우트 */}
+          <Route path="*" element={<NotFound />} />
+
+          {/* footer 공지사항 라우트 */}
+          <Route path="/notices" element={<NoticePage />} />
+
+          {/* header 이벤트 라우트 */}
+          <Route path="/event" element={<EventPage />} />
+
         </Routes>
         {!hideHeaderFooter && <Footer />}
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/PaymentPage.css';
 import { useOrder } from '../OrderContext'; // 전역 주문 상태(Context) 훅
@@ -15,8 +15,19 @@ function PaymentPage() {
     shippingFee,   // 배송비
     userPoints,    // 사용자 보유 포인트
     pointsToUse, setPointsToUse, // 사용할 포인트 상태
-    lastName, firstName, phone, postcode, address, addressDetail, deliveryMessage // 배송지 정보
+    lastName, firstName, phone, postcode, address, addressDetail, deliveryMessage, // 배송지 정보
+    orderItems,
+    setCartItems
   } = useOrder();
+
+  useEffect(() => {
+    // 상품 금액이 0이거나 유효하지 않으면 (새로고침으로 Context가 초기화된 경우)
+    if (orderSubtotal <= 0) {
+        
+        alert("유효하지 않은 주문 정보입니다. 장바구니로 돌아갑니다.");
+        navigate('/cart'); //  장바구니 페이지로 강제 이동
+    }
+}, [orderSubtotal, navigate]); // orderSubtotal이 0일 때 실행되도록 설정
 
   // 로컬 상태 관리: 결제 수단, 약관 동의, 약관 팝업 표시 여부
   const [paymentMethod, setPaymentMethod] = useState('api'); // 'api' 또는 'card'
@@ -61,6 +72,20 @@ function PaymentPage() {
     const { name, checked } = e.target;
     setAgreements(prev => ({ ...prev, [name]: checked }));
   };
+  const generateOrderName = (items) => {
+    if (!items || items.length === 0) {
+        return "Coco 뷰티 상품";
+    }
+    
+    const firstItemName = items[0].productName; // 첫 번째 상품의 이름
+    
+    if (items.length === 1) {
+        return firstItemName; // 상품이 1개일 경우 이름만 표시
+    }
+    
+    const remainingCount = items.length - 1; // 나머지 상품 개수
+    return `${firstItemName} 외 ${remainingCount}건`; 
+};
 
 
   // '결제하기' 버튼 클릭 시 최종 유효성 검사 및 '진짜' 결제 처리
@@ -82,7 +107,7 @@ function PaymentPage() {
         pg: "kakaopay", // PG사 (예: 카카오페이)
         pay_method: "card", // 결제 방식
         merchant_uid: `coco_order_${new Date().getTime()}`, // 고유한 주문번호
-        name: "Coco 뷰티 상품 외 1건", // 주문명
+        name: generateOrderName(orderItems), // 주문명
         amount: finalAmount, // ★★★ 실제 최종 결제 금액 ★★★
         buyer_name: `${lastName}${firstName}`, // 구매자 이름
         buyer_tel: phone,                      // 구매자 연락처
@@ -98,13 +123,12 @@ function PaymentPage() {
 
          
           const orderData = {
-            orderItems: [
-              { 
-                prdNo: 1,       // (임시) 1번 상품
-                optionNo: 1,    // (임시) 1번 옵션
-                orderQty: 2     // (임시) 2개 주문
-              } 
-            ],
+            // 1. 주문 상품 목록 (가장 중요)
+              orderItems: orderItems?.map(item => ({ 
+                  prdNo: Number(item.prdNo),       
+                  optionNo: Number(item.optionNo),    
+                  orderQty: Number(item.cartQty), 
+              })),
             // 배송지 정보
             recipientName: lastName + firstName, 
             recipientPhone: phone,
@@ -112,7 +136,9 @@ function PaymentPage() {
             orderAddress1: address,
             orderAddress2: addressDetail,
             deliveryMessage: deliveryMessage || "조심해서 배송해 주세요.",
+            //포인트
             pointsUsed: pointsToUse
+            
           };
 
           // 토큰 가져오기
@@ -130,11 +156,36 @@ function PaymentPage() {
               const realOrderNo = response.data; 
               console.log("백엔드 저장 성공. 주문번호:", realOrderNo);
 
-              alert("주문이 성공적으로 완료되었습니다!");
+              // 장바구니 비우기 로직 
+              return axios.delete('http://localhost:8080/api/coco/members/cart/items', {
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                  }
+              })
               
-              //  성공 페이지로 이동하며 주문 번호를 state로 전달
-              navigate('/order-success', { state: { orderNo: realOrderNo } }); 
+              // 성공-장바구니 비우기 성공 및 최종 이동
+              .then(() => {
+                  console.log("장바구니 비우기 성공. FE 상태 초기화.");
+                  
+                  // Context 상태 초기화
+                  if (setCartItems) { 
+                      setCartItems([]); 
+                  }
+                  window.dispatchEvent(new Event("cartUpdated"));
+                  
+                  alert("주문이 성공적으로 완료되었습니다!");
+                  // 최종 성공 페이지로 이동하며 주문 번호 전달
+                  navigate('/order-success', { state: { orderNo: realOrderNo } });
+              })
+              
+              // 실패-장바구니 비우기 실패 (주문은 성공했으므로 이동)
+              .catch((cartError) => {
+                  // 실패 시 알림 없이 콘솔에만 로그를 남기고 성공 처리
+                  console.error("장바구니 비우기 실패 (하지만 주문은 성공됨):", cartError);
+                  navigate('/order-success', { state: { orderNo: realOrderNo } });
+              });
             })
+
             .catch((error) => {
               console.error("백엔드 저장 실패:", error);
               

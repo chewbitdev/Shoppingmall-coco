@@ -10,26 +10,26 @@ function OrderDetail() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!orderNo || !token) return;
-
-    axios
-      .get(`http://localhost:8080/api/coco/orders/${orderNo}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .then((res) => {
-        setOrder(res.data);
-      })
-      .catch((err) => {
-        console.error("주문 상세 조회 실패:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [orderNo]);
+  
+  if (!orderNo || !token) return;
+  axios
+    .get(`http://localhost:8080/api/orders/${orderNo}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((res) => {
+      setOrder(res.data);
+    })
+    .catch((err) => {
+      console.error("주문 상세 조회 실패:", err);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, [orderNo, token]);
 
   if (loading) return <p className="loading-text">불러오는 중...</p>;
   if (!order) return <p className="empty-order">주문 정보를 찾을 수 없습니다.</p>;
@@ -77,13 +77,13 @@ return (
     <div className="section-box">
       <h3>주문 상품 {order.items.length}개</h3>
 
-      {order.items.map((item) => (
-        <div key={item.orderItemNo} className="product-card">
+       {order.items.map((item, idx) => (
+           <div key={idx} className="product-card">
           <img src={item.imageUrl} alt="" className="product-img"/>
           <div className="product-info">
             <p className="product-name">{item.productName}</p>
             <p className="product-detail">
-              {item.price.toLocaleString()}원 / {item.qty}개
+              {item.price?.toLocaleString() || 0}원 / {item.qty}개
             </p>
             </div>
             {order.status === "배송완료" && (
@@ -112,26 +112,36 @@ return (
 
       <div className="price-row">
         <span>상품 금액</span>
-        <span>{order.totalPrice.toLocaleString()}원</span>
+        <span>{Number(order.totalPrice || 0).toLocaleString()}원</span>
       </div>
 
-      {order.pointsUsed > 0 && (
-        <div className="price-row">
-          <span>적립금 사용</span>
-          <span>-{order.pointsUsed.toLocaleString()}원</span>
-        </div>
-      )}
+      <div className="price-row">
+        <span>적립금 사용</span>
+        <span>{Number(order.pointsUsed || 0).toLocaleString()}원</span>
+      </div>
+
+      <div className="price-row">
+        <span>배송비</span>
+        <span>{Number(order.deliveryFee || 0).toLocaleString()}원</span>
+      </div>
 
       <div className="price-total">
         <strong>결제 금액</strong>
-        <strong>{(order.totalPrice - (order.pointsUsed || 0)).toLocaleString()}원</strong>
+        <strong>
+          {(
+            Number(order.totalPrice || 0) -
+            Number(order.pointsUsed || 0) +
+            Number(order.deliveryFee || 0)
+          ).toLocaleString()}원
+        </strong>
       </div>
     </div>
 
     <button className="list-btn" onClick={() => navigate("/order-history")}>
       목록
     </button>
-  </div>
+
+  </div> 
 );
 }
 

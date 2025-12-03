@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../css/Cart.css";
-import OrderSteps from "../components/OrderSteps.js";
-import { getStoredMember } from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { useOrder } from "./OrderContext";
 
 function Cart() {
-  const [cartItems, setCartItems] = useState([]);
+  const { cartItems, setCartItems } = useOrder();
   const [selectedItems, setSelectedItems] = useState([]);
 
   const navigate = useNavigate();
@@ -33,7 +32,7 @@ function Cart() {
         window.dispatchEvent(new Event("cartUpdated"));
       })
       .catch((err) => console.error("장바구니 불러오기 실패:", err));
-  }, [token]);
+  }, [token, setCartItems]);
 
   // 체크박스 로직
   const toggleSelectItem = (cartNo) => {
@@ -43,6 +42,8 @@ function Cart() {
         : [...prev, cartNo]
     );
   };
+
+ 
 
   const selectAll = () => {
     setSelectedItems(cartItems.map((item) => item.cartNo));
@@ -59,19 +60,9 @@ function Cart() {
   const selectedTotalPrice = cartItems
     .filter((item) => selectedItems.includes(item.cartNo))
     .reduce((total, item) => total + item.productPrice * item.cartQty, 0);
-
-  // 총 상품 금액 계산
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.productPrice * item.cartQty,
-    0
-  );
-
-  // 배송비 계산 (3만원 미만 = 3000원 / 이상 = 무료)
-  const shippingFee = selectedTotalPrice >= 30000 ? 0 : 3000;
-
-  // 총 구매 금액 (상품 금액 + 배송비)
-  const finalTotalPrice = selectedTotalPrice + shippingFee;
-
+   
+  //배송비
+  const shippingFee = selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0;
   // 수량 변경
   const updateQuantity = (cartNo, newQty) => {
     axios
@@ -152,31 +143,59 @@ function Cart() {
           prev.filter((item) => !selectedItems.includes(item.cartNo))
         );
         setSelectedItems([]);
-        window.dispatchEvent(new Event("cartUpdated"));
+        
       })
       .catch((err) => console.error("선택 삭제 실패:", err));
   };
 
-  // 주문하기 → 배송 정보 페이지로 이동
+  // 주문하기 > 배송 정보 페이지로 이동
   const handleCheckoutSelected = () => {
     if (selectedItems.length === 0) {
       alert("주문할 상품을 선택해주세요.");
       return;
     }
-    navigate("/order");
+   //  선택된 상품 목록 추출
+  const selectedCartItems = cartItems
+  .filter(item => selectedItems.includes(item.cartNo))
+  .map(item => ({ 
+          ...item, // 모든 필드 포함 (PG사 연동 대비)
+          // orderQty: item.cartQty // 필요에 따라 DTO 필드 매핑 추가 가능
+      }));
+  
+    navigate("/order", {
+      state: {
+        orderItems: selectedCartItems,
+        orderSubtotal: selectedTotalPrice,
+        shippingFee: shippingFee,
+      },
+    });
   };
 
+  // 전체 주문하기
   const handleCheckoutAll = () => {
     if (cartItems.length === 0) {
       alert("장바구니가 비어 있습니다.");
       return;
     }
-    navigate("/order");
+
+    const subtotal = cartItems.reduce(
+      (total, item) => total + item.productPrice * item.cartQty,
+      0
+    );
+    const shippingFee = subtotal >= 30000 ? 0 : 3000;
+
+    navigate("/order", {
+      state: {
+        orderItems: cartItems,
+        orderSubtotal: subtotal,
+        shippingFee: shippingFee,
+      },
+    });
   };
 
   return (
     <div className="order-page">
-      <h2 className="order-title">주문하기</h2>
+     <h1 className="order-title">장바구니</h1>
 
       <div className="order-content-area">
         {/*<OrderSteps currentStep={1} />*/}
@@ -270,7 +289,7 @@ function Cart() {
 
           {/* 주문 요약 */}
           <div className="order-summary">
-            <h3>구매 금액</h3>
+            <h3>결제 금액</h3>
 
             {/* 선택된 상품 금액 */}
             <div className="summary-row">
@@ -281,20 +300,16 @@ function Cart() {
             {/* 선택된 금액 기준 배송비 산정 */}
             <div className="summary-row">
               <span>배송비</span>
-              <strong>
-                {(selectedTotalPrice >= 30000 ? 0 : 3000).toLocaleString()}원
-              </strong>
+                <strong>
+                  {(selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0).toLocaleString()}원
+                </strong>
             </div>
 
             {/* 총 구매 금액 */}
             <div className="summary-row total">
               <span>총 구매 금액</span>
               <strong>
-                {(
-                  selectedTotalPrice +
-                  (selectedTotalPrice >= 30000 ? 0 : 3000)
-                ).toLocaleString()}
-                원
+                {(selectedTotalPrice +(selectedTotalPrice > 0 && selectedTotalPrice < 30000 ? 3000 : 0)).toLocaleString()}원
               </strong>
             </div>
 

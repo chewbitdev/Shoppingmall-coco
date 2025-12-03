@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import Pagination from '../../components/admin/Pagination';
 import Spinner from '../../components/admin/Spinner';
 import '../../css/admin/AdminProductList.css';
+import editIcon from '../../images/edit.svg';
+import deleteIcon from '../../images/delete.svg';
 
 /**
  * [AdminProductList] 관리자용 상품 관리 페이지
@@ -62,13 +64,19 @@ function AdminProductList() {
           status: selectedStatus || undefined
         };
 
+        // 토큰 가져오기
+        const token = localStorage.getItem('token');
+
         // 상품 목록 요청
         const productRes = await axios.get('http://localhost:8080/api/products', { params });
         setProducts(productRes.data.content);
         setTotalPages(productRes.data.totalPages);
 
         // 통계 요청
-        const statsRes = await axios.get('http://localhost:8080/api/admin/stats');
+        const statsRes = await axios.get('http://localhost:8080/api/admin/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
         setDashboardCounts({
           totalProducts: statsRes.data.totalProducts,
           inStock: statsRes.data.inStockProducts,
@@ -95,7 +103,13 @@ function AdminProductList() {
   const handleDelete = async (product) => {
     if (window.confirm(`정말 삭제하시겠습니까?\n상품명: ${product.prdName}`)) {
       try {
-        await axios.delete(`http://localhost:8080/api/admin/products/${product.prdNo}`);
+        // 토큰 가져오기
+        const token = localStorage.getItem('token');
+
+        await axios.delete(`http://localhost:8080/api/admin/products/${product.prdNo}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
         toast.success('삭제되었습니다.');
 
         // 새로고침 로직
@@ -243,14 +257,19 @@ function AdminProductList() {
                     <td>
                       {/* 상태값 CSS 클래스로 색상 처리 */}
                       <span className={`status-tag ${product.status === '판매중' ? 'status-sale' :
-                          product.status === '품절' ? 'status-soldout' : 'status-stop'
+                        product.status === '품절' ? 'status-soldout' : 'status-stop'
                         }`}>
                         {product.status}
                       </span>
                     </td>
+                    {/* 수정, 삭제 버튼 영역 */}
                     <td>
-                      <Link to={`/admin/product/edit/${product.prdNo}`} className="link-edit">수정</Link>
-                      <button onClick={() => handleDelete(product)} className="btn-delete">삭제</button>
+                      <Link to={`/admin/product/edit/${product.prdNo}`} className="icon-btn edit" title="수정">
+                        <img src={editIcon} alt="수정" />
+                      </Link>
+                      <button onClick={() => handleDelete(product)} className="icon-btn delete" title="삭제">
+                        <img src={deleteIcon} alt="삭제" />
+                      </button>
                     </td>
                   </tr>
                 ))
