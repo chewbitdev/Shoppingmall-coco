@@ -94,7 +94,7 @@ public class OrderService {
         Order order = new Order();
         order.setMember(member);
         order.setOrderDate(LocalDate.now());
-        order.setStatus("PENDING");
+        order.setStatus("PAID");
         order.setTotalPrice(finalTotalPrice);
 
         order.setRecipientName(requestDto.getRecipientName());
