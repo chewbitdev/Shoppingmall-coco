@@ -41,8 +41,9 @@ public class RecommendationService {
     
     private static final int HIGH_MATCH = 70;
     private static final int MEDIUM_MATCH = 40;
-    private static final int RANDOM_LIMIT_2 = 2;
-    private static final int RANDOM_LIMIT_4 = 4;
+    private static final int RANDOM_PRODUCT = 8;
+    private static final int RANDOM_REVIEW = 2;
+    private static final int RANDOM_USER = 4;
     
     /* 통합 추천 API */
     public RecommendResponseDTO recommendAll(Long loginUserNo) {
@@ -94,11 +95,11 @@ public class RecommendationService {
         List<ProductEntity> shuffled = new ArrayList<>(productSet);
         Collections.shuffle(shuffled);
         return shuffled.stream()
-                .limit(RANDOM_LIMIT_4)
+                .limit(RANDOM_PRODUCT)
                 .map(p -> RecommendPrdDTO.builder()
                         .productNo(p.getPrdNo())
                         .productName(p.getPrdName())
-                        .productPrice(p.getPrdPrice())   // 기존 getPrice() -> getPrdPrice()
+                        .productPrice(p.getPrdPrice())
                         .productImg(getMainImageUrl(p))
                         .build())
                 .collect(Collectors.toList());
@@ -144,7 +145,7 @@ public class RecommendationService {
         Collections.shuffle(shuffled);
         
         return shuffled.stream()
-                .limit(RANDOM_LIMIT_2)
+                .limit(RANDOM_REVIEW)
                 .map(r -> RecommendReviewDTO.builder()
                         .reviewNo(r.getReviewNo())
                         .productNo(r.getOrderItem().getProduct().getPrdNo())
@@ -180,7 +181,7 @@ public class RecommendationService {
         Collections.shuffle(candidates);
         
         return candidates.stream()
-                .limit(RANDOM_LIMIT_4)
+                .limit(RANDOM_USER)
                 .map(u -> new RecommendUserDTO(
                         u.getMemNo(),
                         u.getMemNickname(),
