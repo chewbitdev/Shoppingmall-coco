@@ -39,7 +39,13 @@ function ProductDetailPage() {
         const response = await axios.get(`http://localhost:8080/api/products/${productId}`);
         const data = response.data;
 
-        // 판매 중지 상품 접근 차단 로직 -> 에러 페이지로 이동
+        // 데이터가 아예 없는 경우
+        if (!data) {
+            navigate('/not-found', { replace: true });
+            return;
+        }
+
+        // 판매 중지 상품 체크
         if (data.status === 'STOP' || data.status === '판매중지') {
             navigate('/product-stopped', { replace: true }); // 에러 페이지로 이동
             return;
@@ -48,6 +54,8 @@ function ProductDetailPage() {
         setProduct(data);
       } catch (error) {
         console.error(error);
+        // 상품이 없는 경우 (404 에러 등) -> NotFound 페이지로 이동
+        navigate('/not-found', { replace: true });
         setProduct(null);
       } finally {
         setIsLoading(false);
@@ -182,14 +190,7 @@ function ProductDetailPage() {
   }
 
   if (!product) {
-    return (
-      <div className="detail-container">
-        <div className="error-message-box">
-          <h3>상품을 찾을 수 없습니다</h3>
-          <button className="back-btn" onClick={handleBack}>목록으로 돌아가기</button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
