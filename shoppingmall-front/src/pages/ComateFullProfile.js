@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
 import '../css/ComateProfile.css';
 import sampleImg_profile from '../images/sampleImg_profile.png'; // 임시 프로필 이미지
@@ -17,6 +18,7 @@ const ComateFullProfile = ({
     matchingRate,
     onTabClick 
 }) => {
+    const navigate = useNavigate();
 
     const getMatchClass = (matchingRate) => {
         if (70 <= matchingRate) return "high";
@@ -80,6 +82,18 @@ const ComateFullProfile = ({
                     }}
                 >
                     {isFollowing ? "팔로잉" : "팔로우"}
+                </button>
+            )}
+            {/* 내 프로필이면 피부 프로필 설정 버튼 */}
+            {isMine && (
+                <button
+                    className="set_skinProfile_btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        navigate("/profile-edit");
+                    }}
+                >
+                    피부 프로필 수정
                 </button>
             )}
         </div>
