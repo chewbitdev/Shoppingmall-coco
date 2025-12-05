@@ -4,13 +4,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
+@PropertySources({
+    @PropertySource(value = {"file: c:/springBootWorkspace/webservice/configure.properties",
+        "file:/usr/local/project/properties/configure.properties",},
+        ignoreResourceNotFound = true)
+})
 public class ShoppingmallCocoApplication extends SpringBootServletInitializer {
-
-// properties 연결 필요
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
