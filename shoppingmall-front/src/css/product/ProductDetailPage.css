@@ -115,8 +115,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  line-height: 1.1;
 }
 
 .fixed-top-btn:hover {
@@ -197,6 +195,10 @@
     right: 20px;
     width: 45px;
     height: 45px;
-    font-size: 11px;
+  }
+  
+  .fixed-top-btn svg {
+      width: 20px;
+      height: 20px;
   }
 }
