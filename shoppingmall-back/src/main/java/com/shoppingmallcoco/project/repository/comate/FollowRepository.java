@@ -3,6 +3,8 @@ package com.shoppingmallcoco.project.repository.comate;
 import com.shoppingmallcoco.project.dto.comate.FollowInfoDTO;
 import com.shoppingmallcoco.project.entity.auth.Member;
 import com.shoppingmallcoco.project.entity.comate.Follow;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -74,5 +76,14 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
             """, 
            nativeQuery = true)
     List<Member> findRandomMembersForGuest();
+
+    /* 팔로워 수 많은 유저 조회 */
+    @Query("""
+    	    SELECT f.following
+    	    FROM Follow f
+    	    GROUP BY f.following
+    	    ORDER BY COUNT(f.follower) DESC
+	""")
+	List<Member> findUsersOrderByFollowerCount(Pageable pageable);
 
 }

@@ -48,3 +48,26 @@ section {
 .recommend_user_nickname {
     font-weight: 500;
 }
+.fallback {
+    display: inline-block;
+    width: auto;
+    font-size: 15px;
+    color: #F57878;
+    border: 1px solid #F57878;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+.fallback:hover {
+    display: inline-block;
+    width: auto;
+    font-size: 15px;
+    color: #F57878;
+    background-color: #FFE6E6;
+    border: 1px solid #F57878;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 5px;
+    cursor: pointer;
+}
