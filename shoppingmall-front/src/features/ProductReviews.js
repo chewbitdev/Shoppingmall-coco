@@ -15,7 +15,7 @@ function ProductReviews({ productNo }) {
     const [totalPages, setTotalPages] = useState(0);
     const [filtered, setFiltered] = useState("latest");
     const pageSize = 10;
-    
+
     // 리뷰 삭제
     const handleDeleteReview = async (reviewNo) => {
         try {
@@ -98,15 +98,13 @@ function ProductReviews({ productNo }) {
         return <div style={{ padding: '20px', textAlign: 'center' }}>리뷰를 불러오는 중...</div>;
     }
 
-    if (reviews.length === 0) {
-        return <div style={{ padding: '20px', textAlign: 'center' }}>작성된 리뷰가 없습니다.</div>;
-    }
-
     return (
         <div className="review-list-container" style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div className="review-header">
                 <h2 className="review-title">리뷰 (총 {reviews.length}개)</h2>
                 <div className="filter-container">
+                    <div className="filter" >정렬</div>
+                    <p className="filter-bar"> | </p>
                     <button type="button" className="filter-latest" onClick={() => {
                         setFiltered("latest");
                         setPage(0);
@@ -127,6 +125,9 @@ function ProductReviews({ productNo }) {
                     onClick={() => getOrerItemNo()}
                 >리뷰쓰기 ✎</button>
             </div>
+            {reviews.length === 0 ? (
+                <div className="error">관련 리뷰가 없습니다.</div>
+            ) : null}
             {reviews.map((review) => (
                 <ReviewDetail
                     key={review.reviewNo}
@@ -135,6 +136,7 @@ function ProductReviews({ productNo }) {
                     productNo={productNo}
                 />
             ))}
+            
             <div className="pagination" style={{ textAlign: "center", margin: "20px 0" }}>
                 <button
                     disabled={page === 0}
