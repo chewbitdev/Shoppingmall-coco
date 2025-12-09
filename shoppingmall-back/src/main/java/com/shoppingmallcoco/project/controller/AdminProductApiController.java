@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,19 +24,19 @@ import com.shoppingmallcoco.project.entity.product.ProductEntity;
 import com.shoppingmallcoco.project.service.auth.MemberService;
 import com.shoppingmallcoco.project.service.product.AdminProductService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 관리자 전용 상품 관리 REST API 컨트롤러
  * 경로: /api/admin/**
  */
 @RestController
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminProductApiController {
 	
-	@Autowired
-	private AdminProductService prdService;
-	
-	@Autowired
-	private MemberService memberService;
+	private final AdminProductService prdService;
+    private final MemberService memberService;
 	
 	// 관리자 권한 검증 헬퍼 메서드
 	private void checkAdminRole(Authentication authentication) {
