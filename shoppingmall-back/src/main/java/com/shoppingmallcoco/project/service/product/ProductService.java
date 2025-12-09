@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
 
 import com.shoppingmallcoco.project.entity.product.ProductEntity;
 import com.shoppingmallcoco.project.repository.product.ProductRepository;
@@ -22,13 +22,11 @@ import com.shoppingmallcoco.project.service.review.IReviewService;
  * 일반 사용자용 상품 조회 및 검색 기능을 담당하는 서비스 클래스
  */
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-	@Autowired
-	private ProductRepository prdRepo;
-
-	@Autowired
-	private IReviewService reviewService;
+	private final ProductRepository prdRepo;
+    private final IReviewService reviewService;
 	
 	// 검색어 매핑 테이블 (한글 검색어 -> DB에 저장된 영문 태그 값 매핑)
     private static final Map<String, String> SEARCH_KEYWORD_MAP = new HashMap<>();

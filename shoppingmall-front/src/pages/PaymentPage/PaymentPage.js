@@ -145,7 +145,7 @@ function PaymentPage() {
           const token = localStorage.getItem('token');
 
           //  Axios로 백엔드 API 호출 (헤더에 토큰 포함)
-          axios.post('http://localhost:8080/api/orders', orderData, {
+          axios.post('http://13.231.28.89:18080/api/orders', orderData, {
             headers: {
               'Authorization': `Bearer ${token}`, 
               'Content-Type': 'application/json'
@@ -157,7 +157,7 @@ function PaymentPage() {
               console.log("백엔드 저장 성공. 주문번호:", realOrderNo);
 
               // 장바구니 비우기 로직 
-              return axios.delete('http://localhost:8080/api/coco/members/cart/items', {
+              return axios.delete('http://13.231.28.89:18080/api/coco/members/cart/items', {
                   headers: {
                       'Authorization': `Bearer ${token}`,
                   }
