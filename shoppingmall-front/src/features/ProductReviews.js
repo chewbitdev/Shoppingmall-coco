@@ -13,7 +13,8 @@ function ProductReviews({ productNo }) {
 
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [filtered, setFiltered] = useState("latest");
+    const [sortType, setSortType] = useState("latest");
+    const [coMate, setCoMate] = useState(false);        // 필터 체크박스
     const pageSize = 10;
 
     // 리뷰 삭제
@@ -26,7 +27,7 @@ function ProductReviews({ productNo }) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            await axios.delete(`http://localhost:8080/api/reviews/${reviewNo}`, { headers });
+            await axios.delete(`http://13.231.28.89:18080/api/reviews/${reviewNo}`, { headers });
             setReviews(currentReviews =>
                 currentReviews.filter(review => review.reviewNo !== reviewNo))
         } catch (error) {
@@ -42,19 +43,21 @@ function ProductReviews({ productNo }) {
             try {
                 const token = localStorage.getItem('token');
                 const headers = {};
-                if (filtered === "co-mate") {
+                if (coMate) { // co-mate 필터가 켜졌을 때만 토큰 필요
                     if (!token) {
                         alert("Co-mate 필터는 로그인이 필요합니다.");
                         setLoading(false);
+                        setCoMate(false);
                         return;
                     }
                     headers["Authorization"] = `Bearer ${token}`;
                 }
-                const response = await axios.get(`http://localhost:8080/api/products/${productNo}/reviewPages`, {
+                const response = await axios.get(`http://13.231.28.89:18080/api/products/${productNo}/reviewPages`, {
                     params: {
                         page,
                         size: pageSize,
-                        filterType: filtered, // latest / oldest / co-mate
+                        sortType, // latest / oldest
+                        coMate,
                     },
                     headers,
                 });
@@ -69,7 +72,7 @@ function ProductReviews({ productNo }) {
         };
 
         fetchReviews();
-    }, [productNo, page, filtered]);
+    }, [productNo, page, sortType, coMate]);
 
     // 주문 이력 불러오기
     const getOrerItemNo = async () => {
@@ -80,7 +83,7 @@ function ProductReviews({ productNo }) {
                 alert("로그인이 필요합니다.");
                 return;
             }
-            const response = await axios.get(`http://localhost:8080/api/reviews/${productNo}/getOrderItemNo`, { headers: { Authorization: `Bearer ${token}` } });
+            const response = await axios.get(`http://13.231.28.89:18080/api/reviews/${productNo}/getOrderItemNo`, { headers: { Authorization: `Bearer ${token}` } });
             const orderItemNoFromApi = response.data;
             setOrderItemNo(orderItemNoFromApi);
             return navigate(`/reviews/${orderItemNoFromApi}`);
@@ -103,22 +106,27 @@ function ProductReviews({ productNo }) {
             <div className="review-header">
                 <h2 className="review-title">리뷰 (총 {reviews.length}개)</h2>
                 <div className="filter-container">
-                    <div className="filter" >정렬</div>
-                    <p className="filter-bar"> | </p>
                     <button type="button" className="filter-latest" onClick={() => {
-                        setFiltered("latest");
+                        setSortType("latest");
                         setPage(0);
                     }}>최신순</button>
                     <p className="filter-bar"> | </p>
                     <button type="button" className="filter-oldest" onClick={() => {
-                        setFiltered("oldest");
+                        setSortType("oldest");
                         setPage(0);
                     }}>오래된 순</button>
                     <p className="filter-bar"> | </p>
-                    <button type="button" className="filter-co-mate" onClick={() => {
-                        setFiltered("co-mate");
-                        setPage(0);
-                    }}>Co-mate</button>
+                    <label className="filter-co-mate">
+                        <input
+                            type="checkbox"
+                            checked={coMate}
+                            onChange={(e) => {
+                                setCoMate(e.target.checked);
+                                setPage(0);
+                            }}
+                        />
+                        Co-mate만 보기
+                    </label>
                 </div>
                 <button
                     className="review-btn"
@@ -136,7 +144,7 @@ function ProductReviews({ productNo }) {
                     productNo={productNo}
                 />
             ))}
-            
+
             <div className="pagination" style={{ textAlign: "center", margin: "20px 0" }}>
                 <button
                     disabled={page === 0}
