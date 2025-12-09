@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -158,10 +161,8 @@ public class AdminProductService {
 				String fileName = img.getImageUrl().substring(img.getImageUrl().lastIndexOf("/") + 1);
 				
 				// 실제 삭제 경로
-				File fileToDelete = new File(getProductUploadPath() + fileName);
-				if (fileToDelete.exists()) {
-				    fileToDelete.delete();
-				}
+				Path filePath = Paths.get(getProductUploadPath() + fileName);
+			    Files.deleteIfExists(filePath);
 			}
 		}
 

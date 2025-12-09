@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.Map;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -29,7 +29,10 @@ public class EmailVerificationService {
     private final Map<String, VerificationCode> verificationCodes = new ConcurrentHashMap<>();
     
     // 인증번호 유효시간 설정 (5분)
-    private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 5L * 60 * 1000;
+    
+    // Random 객체를 클래스 레벨의 상수로 선언하여 재사용
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     public EmailVerificationService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -37,8 +40,7 @@ public class EmailVerificationService {
 
     // 인증번호 생성 및 이메일 전송 처리
     public String generateVerificationCode(String email) {
-        Random random = new Random();
-        String code = String.format("%06d", random.nextInt(1000000));
+    	String code = String.format("%06d", secureRandom.nextInt(1000000));
         
         verificationCodes.put(email, new VerificationCode(code, System.currentTimeMillis()));
         
