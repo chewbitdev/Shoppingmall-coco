@@ -112,7 +112,6 @@ function ReviewDetail({ reviewData, onDelete, productNo }) {
             }
         }
         getBuyCount();
-        console.log("buyCount", buyCount);
         
     }, [productNo])
 
