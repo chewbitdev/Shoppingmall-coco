@@ -5,7 +5,6 @@ import com.shoppingmallcoco.project.service.review.ReviewService;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,7 @@ import com.shoppingmallcoco.project.service.product.ProductService;
 @RequiredArgsConstructor
 public class ProductApiController {
 
-    @Autowired
-    private ProductService prdService;
+	private final ProductService prdService; 
     private final ReviewService reviewService;
     private final MemberRepository memberRepository;
 

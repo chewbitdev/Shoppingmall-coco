@@ -1,21 +1,22 @@
 package com.shoppingmallcoco.project.service.product;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shoppingmallcoco.project.entity.product.CategoryEntity;
 import com.shoppingmallcoco.project.repository.product.CategoryRepository;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 카테고리 관리 비즈니스 로직 서비스
  * - 카테고리 생성, 수정(부모-자식 관계 변경 포함), 삭제 기능 제공
  */
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 	
-	@Autowired
-	private CategoryRepository catRepo;
+	private final CategoryRepository catRepo;
 	
 	// 카테고리 생성
     @Transactional
