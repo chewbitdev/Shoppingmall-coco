@@ -134,7 +134,7 @@ public class ReviewService implements IReviewService {
             for (MultipartFile file : files) {
                 String storedFileName = fileUploadService.upload(file);
 
-                String imageUrl = "/images/" + storedFileName;  // ← 이 줄 추가
+                String imageUrl = "/images/" + storedFileName;
 
                 ReviewImage reviewImage = ReviewImage.toEntity(imageUrl, findReview);
                 reviewImageRepository.save(reviewImage);
