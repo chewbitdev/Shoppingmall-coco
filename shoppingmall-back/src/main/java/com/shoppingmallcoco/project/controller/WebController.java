@@ -16,6 +16,7 @@ public class WebController implements ErrorController {
         return "forward:/index.js";
     }
     
+    
     @RequestMapping("/error")
     public String errorHandle(HttpServletRequest request) {
         String returnView = "";
