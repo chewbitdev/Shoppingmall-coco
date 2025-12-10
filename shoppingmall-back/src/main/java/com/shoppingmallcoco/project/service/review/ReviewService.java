@@ -76,7 +76,9 @@ public class ReviewService implements IReviewService {
         // 업로드한 파일 MultipartFile 객체에 하나씩 담기, 파일 upload, entity로 변환, 리뷰이미지에 save
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
-                String imageUrl = fileUploadService.upload(file);
+                String storedFileName = fileUploadService.upload(file);
+
+                String imageUrl = "/images/" + storedFileName;
 
                 ReviewImage reviewImage = ReviewImage.toEntity(imageUrl, review);
 
