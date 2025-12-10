@@ -1,58 +1,30 @@
 package com.shoppingmallcoco.project.controller;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class WebController implements ErrorController {
 
-    // React SPA 라우팅을 위한 fallback - 모든 경로를 index.html로 리다이렉트
-    @RequestMapping(value = {
-        "/",
-        "/login",
-        "/login/naver/callback",
-        "/signup/terms",
-        "/signup/info",
-        "/find-account",
-        "/kakao/additional-info",
-        "/mypage",
-        "/cart",
-        "/order",
-        "/order-history",
-        "/order-detail/**",
-        "/products/**",
-        "/product",
-        "/comate/**",
-        "/my-comate",
-        "/reviews/**",
-        "/update-reviews/**",
-        "/write-review/**",
-        "/admin",
-        "/admin/**",
-        "/payment",
-        "/order-success",
-        "/order-fail",
-        "/terms/**",
-        "/notices",
-        "/event",
-        "/account-settings",
-        "/profile-edit",
-        "/error/**",
-        "/error/403",
-        "/product-stopped",
-        "/purchased-product"
-    })
-    public String index() {
-        // Spring Boot가 React의 index.html 파일을 반환하도록 설정
-        // index.html은 /resources/static에 위치
-        return "forward:/index.html";
-    }
-
-    // 에러 페이지도 index.html로 처리 (404 등)
-    @GetMapping("/error")
-    public String handleError() {
+    // 에러 페이지 처리 (404 등) - WebMvcConfig에서 처리되지 않은 경우에만 여기로 옴
+    @RequestMapping("/error")
+    public String handleError(HttpServletRequest request) {
+        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        
+        if (status != null) {
+            Integer statusCode = Integer.valueOf(status.toString());
+            
+            // 404 에러면 index.html로 포워드하여 React Router가 처리하도록
+            if (statusCode == HttpStatus.NOT_FOUND.value()) {
+                return "forward:/index.html";
+            }
+        }
+        
         return "forward:/index.html";
     }
 }
