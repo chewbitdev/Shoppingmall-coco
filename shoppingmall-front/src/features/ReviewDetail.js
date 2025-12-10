@@ -150,10 +150,10 @@ function ReviewDetail({ reviewData, onDelete, productNo }) {
                     <span className='username'>{userNickname}</span>
                     <div className='resale'>{buyCount}번째 구매 </div>
                     <div className='stars'>
-                        {starArray.map((index) => (
+                        {starArray.map((star, i) => (
                             <img
-                                key={index}
-                                src={clicked[index] ? yellowStar : greyStar}
+                                key={i}
+                                src={clicked[i] ? yellowStar : greyStar}
                                 alt='별점 이미지'
                             />
                         ))}
