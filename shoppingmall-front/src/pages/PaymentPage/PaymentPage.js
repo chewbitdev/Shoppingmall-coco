@@ -100,7 +100,7 @@ function PaymentPage() {
       // 2-1. 'API 간편결제'일 경우: '포트원' 실제 결제 로직
       
       const { IMP } = window; // index.html에서 로드한 IMP 객체
-      IMP.init("iamport"); // 테스트용 가맹점 식별코드
+      IMP.init("imp23266132"); // 테스트용 가맹점 식별코드
 
       // 결제 요청 데이터 정의
       const data = {
