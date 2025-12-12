@@ -32,8 +32,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 토큰 기반 인증이므로 CSRF 보호는 비활성화
-            .csrf(csrf -> csrf.disable())
+            // CSRF 보호 비활성화 - JWT 토큰 기반 인증 사용으로 안전함
+            .csrf(csrf -> csrf.disable()) // NOSONAR: JWT 기반 인증으로 CSRF 비활성화가 안전함
             // CORS 설정을 커스터마이징된 설정으로 등록
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // 기본 로그인 폼은 사용하지 않음 (프론트엔드에서 처리)
