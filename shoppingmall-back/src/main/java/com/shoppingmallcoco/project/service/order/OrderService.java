@@ -17,6 +17,7 @@ import com.siot.IamportRestClient.response.Payment;
 import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -274,11 +276,10 @@ public class OrderService {
             CancelData cancelData = new CancelData(impUid, true); // 전액 취소
             cancelData.setReason(reason);
             iamportClient.cancelPaymentByImpUid(cancelData);
-            System.out.println("결제 취소 완료: " + impUid + ", 사유: " + reason);
+            log.info("결제 취소 완료: impUid={}, reason={}", impUid, reason);
         } catch (Exception e) {
             // 취소 실패 시 관리자에게 알림
-            System.err.println("결제 취소 실패! 관리자 확인 필요. impUid: " + impUid + ", 원인: " + e.getMessage());
-            e.printStackTrace();
+            log.error("결제 취소 실패! 관리자 확인 필요. impUid={}, reason={}", impUid, reason, e);
         }
     }
 
