@@ -32,7 +32,7 @@ const ComateFollowListCard = ({
                 onFollowChange(true);
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             alert("팔로우/언팔로우 처리 중 문제가 발생했습니다.");
         }
     }

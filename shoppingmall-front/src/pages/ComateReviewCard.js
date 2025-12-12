@@ -33,7 +33,7 @@ const ComateReviewCard = ({
                 await toggleLike(reviewNo, likedByCurrentUser);
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             alert('좋아요 처리 중 오류가 발생했습니다.');
         }
     };

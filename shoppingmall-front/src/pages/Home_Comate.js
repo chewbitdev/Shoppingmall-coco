@@ -79,7 +79,7 @@ function Home_Comate() {
                 setLoginUser(user);
                 setIsLoggedIn(true);
             } catch (error) {
-                console.error('로그인 유저 정보 없음 (비로그인 상태/토큰 만료) ', error);
+                // console.error('로그인 유저 정보 없음 (비로그인 상태/토큰 만료) ', error);
                 setLoginUser(null);
                 setIsLoggedIn(false);
             }
@@ -102,7 +102,7 @@ function Home_Comate() {
                 setFollowStatus(status);
 
             } catch (error) {
-                console.error(error);
+                // console.error(error);
                 alert("회원 정보를 불러오는 중 오류가 발생했습니다.");
             } finally {
                 setLoading(false);
@@ -148,7 +148,7 @@ function Home_Comate() {
             ));
 
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             alert("팔로우/언팔로우 처리 중 오류가 발생했습니다.");
         }
     };

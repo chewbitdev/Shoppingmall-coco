@@ -19,7 +19,9 @@ const ComateRecommend = ({ loginUserNo }) => {
             try {
                 setRecommendData(await getRecommendation());
             } catch (err) {
-                console.error("추천 불러오기 실패:", err);
+                // console.error("추천 불러오기 실패:", err);
+                alert("잠시 후 다시 접속해주세요.");
+                navigate("/");
             } finally {
                 setLoading(false);
             }

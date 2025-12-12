@@ -52,7 +52,7 @@ const ComateContent = ({
                 setLikeList(sortedList);
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             alert('리스트를 불러오는 중 오류가 발생했습니다.');
         }
     };

@@ -65,7 +65,7 @@ const Comate = () => {
                     setTargetMemNo(memNo || null);
                 }
             } catch (error) {
-                console.error('로그인 유저 정보 불러오기 실패 (비로그인 상태/토큰 만료) ', error);
+                // console.error('로그인 유저 정보 불러오기 실패 (비로그인 상태/토큰 만료) ', error);
 
                 // 비로그인-> userType='user' targetMemNo 는 URL 에서 가져옴
                 setLoginUser(null);
@@ -88,7 +88,6 @@ const Comate = () => {
                 setMember(data);
                 setFollowing(data.following);
             } catch (error) {
-                console.error(error);
                 alert("회원 정보를 불러오는 중 오류가 발생했습니다. ");
             } finally {
                 setLoading(false);
@@ -128,9 +127,9 @@ const Comate = () => {
                 SetShowDropdown(true);
             } catch (error) {
                 if (error.name === "AbortError") {
-                    console.log("검색 요청 취소");
+                    // console.log("검색 요청 취소");
                 } else {
-                    console.log("검색 오류: ", error);
+                    // console.log("검색 오류: ", error);
                 }
             }
         };
@@ -184,9 +183,9 @@ const Comate = () => {
                 }
             } catch (error) {
                 if (error.name === 'AbortError') {
-                    console.log(`[TabData] 요청 취소됨 targetMemNo=${targetMemNo} tab=${activeTab}`);
+                    // console.log(`[TabData] 요청 취소됨 targetMemNo=${targetMemNo} tab=${activeTab}`);
                 } else {
-                    console.error(error);
+                    // console.error(error);
                     alert(`${activeTab} 데이터를 불러오는 중 오류가 발생햇습니다.`);
                 }
             }
@@ -235,7 +234,6 @@ const Comate = () => {
                 setMember(prev => ({...prev,followerCount: (prev.followerCount || 0) + 1}));
             }
         } catch (error) {
-            console.error(error);
             alert("팔로우/언팔로우 처리 중 오류가 발생했습니다.");
         }
     };
