@@ -43,8 +43,8 @@ public class AdminProductService {
 	@Value("${file.upload-dir}") // application.properties의 값 주입
 	private String rootDir;
 
-	// 도메인 상수 정의
-	private final String DOMAIN = "http://13.231.28.89:18080";
+	@Value("${app.domain}") // application.properties의 도메인 주소 주입
+	private String domain;
 
 	// 상품 전용 업로드 폴더 경로
 	private String getProductUploadPath() {
@@ -268,7 +268,7 @@ public class AdminProductService {
 		// DB에 경로로 저장
 		ProductImageEntity image = new ProductImageEntity();
 		image.setProduct(product);
-		image.setImageUrl(DOMAIN + "/images/products/" + savedFileName);
+		image.setImageUrl(domain + "/images/products/" + savedFileName);
 		image.setSortOrder(sortOrder);
 		prdImgRepo.save(image);
 	}

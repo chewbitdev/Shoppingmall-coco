@@ -92,15 +92,16 @@
 
 .signup-input {
   width: 100%;
-  height: 36px;
-  padding: 4px 12px;
+  height: 40px;
+  padding: 8px 12px;
   background: #F3F3F5;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: #717182;
+  color: #0A0A0A;
   font-size: 14px;
   font-weight: 400;
   font-family: 'Inter', sans-serif;
+  transition: background 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
 }
 
@@ -110,13 +111,20 @@
 
 .signup-input:focus {
   outline: none;
+  background: #ffffff;
   border-color: #155DFC;
-  background: white;
+  box-shadow: 0 0 0 2px rgba(21, 93, 252, 0.12);
+}
+
+.signup-input[readonly] {
+  background: #ECECF0;
+  color: #717182;
+  cursor: default;
 }
 
 .check-button {
   width: 82.45px;
-  height: 36px;
+  height: 40px;
   padding: 8px 16px;
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.10);
@@ -127,17 +135,21 @@
   line-height: 20px;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition: background 0.2s ease;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
-.check-button:hover {
+.check-button:hover:not(:disabled) {
   background: #F3F3F5;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.08);
+}
+
+.check-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .button-group {

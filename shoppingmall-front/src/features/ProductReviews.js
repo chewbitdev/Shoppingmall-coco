@@ -14,7 +14,7 @@ function ProductReviews({ productNo }) {
     const [totalPages, setTotalPages] = useState(0);
     const [sortType, setSortType] = useState("latest");
     const [coMate, setCoMate] = useState(false);        // 필터 체크박스
-    const pageSize = 10;
+    const pageSize = 5;
 
     // 리뷰 삭제
     const handleDeleteReview = (reviewNo) => {
