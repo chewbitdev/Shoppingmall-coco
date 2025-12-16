@@ -3,6 +3,8 @@ package com.shoppingmallcoco.project.dto.comate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.*;
 
 @Getter
@@ -25,6 +27,8 @@ public class RecommendReviewDTO {
     private Integer rating;
     private String content;
     private List<String> tags;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
     
     private boolean likedByLoginUser;
