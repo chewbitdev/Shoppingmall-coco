@@ -59,6 +59,7 @@
 }
 .review_content {
     margin: 30px 10px;
+    white-space: pre-line;
 }
 .review_like_wrapper {
     display: flex;
