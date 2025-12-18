@@ -18,3 +18,13 @@
 .comate-slider-container .slick-next {
     right: 75px;
 }
+
+.comate-slider-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.slick-slide {
+    display: flex !important;
+    justify-content: center;
+}
