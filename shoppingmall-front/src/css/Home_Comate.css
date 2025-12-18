@@ -19,12 +19,6 @@
     right: 75px;
 }
 
-.comate-slider-container {
-    width: 100%;
-    overflow: hidden;
-}
+@media (max-width: 960px) {
 
-.slick-slide {
-    display: flex !important;
-    justify-content: center;
 }

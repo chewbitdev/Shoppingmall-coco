@@ -17,6 +17,7 @@ function Home_Comate() {
     const settings = {
         accessibility: false,
         infinite: true,
+        className: "center",
         centerMode: true,
         centerPadding: "60px",
         slidesToShow: 5,
