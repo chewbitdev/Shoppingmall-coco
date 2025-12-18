@@ -21,14 +21,38 @@ section {
 .recommend_prd_img {
     width: 85%;
     border-radius: 5px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
 }
 .prd_info {
     margin: 5px 10px;
 }
 .recommend_prd_name {
-    font-weight: 500;
-    font-size: 15px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
 }
+.prd_name_text {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 0;
+    transform: translateX(0);
+}
+
+.recommend_prd_name.overflow:hover .prd_name_text {
+    padding-left: 100%;
+    animation: marquee 6s linear infinite;
+}
+  
+@keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+}
+  
 .recommend_prd_price {
     font-size: 15px;
 }

@@ -56,6 +56,8 @@
     border-radius: 12px;
     font-size: 13px;
     color: #444;
+    flex-wrap: nowrap; 
+    white-space: nowrap;
 }
 .review_content {
     margin: 30px 10px;
@@ -88,6 +90,8 @@ a {
 .review_images img {
     border-radius: 5px;
     width: 150px;
+    height: 150px;
+    object-fit: cover;
     margin-bottom: 10px;
 }
 

@@ -48,6 +48,7 @@ function Home_Comate() {
                 settings: {
                     slidesToShow: 2,
                     centerPadding: "25px",
+                    centerMode: false,
                 },
             },
             {
@@ -56,6 +57,7 @@ function Home_Comate() {
                     slidesToShow: 1,
                     centerMode: true,
                     centerPadding: "20px",
+                    centerMode: false,
                 },
             },
         ]
